@@ -12,8 +12,9 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #111827; /* Dark background */
+            background: linear-gradient(135deg, #111827 0%, #0a0e14 100%); /* Subtle gradient background */
             color: #E5E7EB; /* Light text */
+            min-height: 100vh;
         }
         .gradient-text {
             background: linear-gradient(to right, #FFC300, #FF5733);
@@ -23,18 +24,25 @@
         .card {
             background-color: #1F2937; /* Slightly lighter dark for cards */
             border-radius: 0.75rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 15px 25px -5px rgba(0, 0, 0, 0.3), 0 5px 10px -5px rgba(0, 0, 0, 0.1); /* More pronounced shadow */
             padding: 1.5rem;
             border: 1px solid #4B5563; /* Border color */
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smooth transitions */
+        }
+        .card:hover {
+            transform: translateY(-5px); /* Lift effect on hover */
+            box-shadow: 0 20px 35px -8px rgba(0, 0, 0, 0.4), 0 8px 15px -8px rgba(0, 0, 0, 0.2);
         }
         input, select {
             background-color: #1F2937; /* Card background for input */
             color: #E5E7EB; /* Light text for input */
             border: 1px solid #4B5563; /* Border color for input */
+            transition: all 0.2s ease-in-out; /* Smooth transitions for input */
         }
         input:focus, select:focus {
             outline: none;
-            box-shadow: 0 0 0 2px #3B82F6; /* Blue ring for focus */
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.5); /* Stronger blue ring for focus */
+            border-color: #3B82F6;
         }
         .modal-overlay {
             position: fixed;
@@ -42,11 +50,12 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(0, 0, 0, 0.75);
+            background-color: rgba(0, 0, 0, 0.85); /* Darker overlay */
             display: flex;
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            animation: fadeIn 0.3s ease-out; /* Fade in animation */
         }
         .modal-content {
             background-color: #1F2937;
@@ -57,6 +66,7 @@
             overflow-y: auto;
             position: relative;
             border: 1px solid #4B5563;
+            animation: slideIn 0.3s ease-out; /* Slide in animation */
         }
         .close-button {
             position: absolute;
@@ -64,9 +74,13 @@
             right: 1rem;
             background: none;
             border: none;
-            font-size: 1.5rem;
+            font-size: 1.8rem; /* Larger close button */
             color: #E5E7EB;
             cursor: pointer;
+            transition: color 0.2s ease-in-out;
+        }
+        .close-button:hover {
+            color: #FF5733; /* Primary color on hover */
         }
         .team-slot {
             height: 120px; /* Fixed height for hero slot */
@@ -79,19 +93,23 @@
             padding: 0.5rem;
             text-align: center;
             position: relative;
+            transition: all 0.2s ease-in-out; /* Smooth transitions */
         }
         .team-slot img {
             width: 80px;
             height: 80px;
             border-radius: 50%;
             object-fit: cover;
-            border: 2px solid transparent;
+            border: 3px solid transparent; /* Thicker border */
+            transition: border-color 0.2s ease-in-out, transform 0.2s ease-in-out;
         }
         .team-slot.picked img {
             border-color: #33FF57; /* Accent color for picked hero */
+            transform: scale(1.05); /* Slight scale on picked */
         }
         .team-slot.enemy-picked img {
             border-color: #FF5733; /* Primary color for enemy picked hero */
+            transform: scale(1.05);
         }
         .pick-button {
             position: absolute;
@@ -100,14 +118,17 @@
             transform: translateX(-50%);
             background-color: #FFC300; /* Secondary color */
             color: #111827;
-            padding: 0.25rem 0.5rem;
-            border-radius: 0.25rem;
-            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem; /* Slightly larger padding */
+            border-radius: 0.375rem; /* More rounded */
+            font-size: 0.8rem; /* Slightly larger font */
+            font-weight: bold;
             cursor: pointer;
             border: none;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
         }
         .pick-button:hover {
             background-color: #FFD700;
+            transform: translateX(-50%) scale(1.05);
         }
         .reset-button {
             background-color: #C70039; /* Energetic & Playful - Red */
@@ -117,10 +138,32 @@
             font-weight: bold;
             cursor: pointer;
             border: none;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s ease-in-out, transform 0.2s ease-in-out;
         }
         .reset-button:hover {
             background-color: #E50040;
+            transform: translateY(-3px);
+        }
+
+        /* Keyframe Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { transform: translateY(-20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Navigation Button Styles */
+        nav button {
+            transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+        nav button:hover {
+            transform: translateY(-2px);
+        }
+        nav button.active {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
     </style>
 </head>
@@ -2097,6 +2140,19 @@
                     {currentPage === 'tips' && <TipsPage gameplayTips={gameplayTips} comboTips={comboTips} />}
 
                     {selectedHero && <HeroDetailModal hero={selectedHero} onClose={handleCloseModal} />}
+
+                    {/* Logo Section */}
+                    <footer className="w-full text-center py-8 mt-12" style={{ borderTop: `1px solid ${colors.border}` }}>
+                        <img 
+                            src="knoldua.png" 
+                            alt="Knoldua Logo" 
+                            className="mx-auto h-12 w-auto object-contain" 
+                            onerror="this.onerror=null;this.src='https://placehold.co/100x40/4B5563/E5E7EB?text=Logo';" 
+                        />
+                        <p className="text-sm mt-4" style={{ color: colors.subtext }}>
+                            Dibuat dengan ❤️ untuk komunitas Mobile Legends.
+                        </p>
+                    </footer>
                 </div>
             );
         }
