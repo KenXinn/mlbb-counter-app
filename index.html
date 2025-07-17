@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pencari Counter Hero Mobile Legends</title>
+    <title>Pencari & Daftar Hero Mobile Legends</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -27,14 +27,100 @@
             padding: 1.5rem;
             border: 1px solid #4B5563; /* Border color */
         }
-        input {
+        input, select {
             background-color: #1F2937; /* Card background for input */
             color: #E5E7EB; /* Light text for input */
             border: 1px solid #4B5563; /* Border color for input */
         }
-        input:focus {
+        input:focus, select:focus {
             outline: none;
             box-shadow: 0 0 0 2px #3B82F6; /* Blue ring for focus */
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: #1F2937;
+            padding: 2rem;
+            border-radius: 0.75rem;
+            max-width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            border: 1px solid #4B5563;
+        }
+        .close-button {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #E5E7EB;
+            cursor: pointer;
+        }
+        .team-slot {
+            height: 120px; /* Fixed height for hero slot */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px dashed #4B5563;
+            border-radius: 0.5rem;
+            padding: 0.5rem;
+            text-align: center;
+            position: relative;
+        }
+        .team-slot img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid transparent;
+        }
+        .team-slot.picked img {
+            border-color: #33FF57; /* Accent color for picked hero */
+        }
+        .team-slot.enemy-picked img {
+            border-color: #FF5733; /* Primary color for enemy picked hero */
+        }
+        .pick-button {
+            position: absolute;
+            bottom: 5px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #FFC300; /* Secondary color */
+            color: #111827;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: none;
+        }
+        .pick-button:hover {
+            background-color: #FFD700;
+        }
+        .reset-button {
+            background-color: #C70039; /* Energetic & Playful - Red */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.2s;
+        }
+        .reset-button:hover {
+            background-color: #E50040;
         }
     </style>
 </head>
@@ -43,99 +129,1431 @@
     <div id="root"></div>
 
     <script type="text/babel">
-        const heroCounterData = [
+        // Data hero lengkap beserta foto profil dan detail skill
+        // CATATAN: photoUrl saat ini menggunakan placeholder.
+        // Anda bisa menggantinya dengan URL gambar asli hero Mobile Legends.
+        // Contoh: 'https://static.wikia.nocookie.net/mobile-legends/images/e/e0/Hero_Floryn.png' (URL ini mungkin tidak valid atau berubah di masa depan)
+        // Pastikan URL gambar adalah link langsung ke file gambar (.png, .jpg, dll.).
+        const heroData = [
             {
-                name: 'Floryn',
+                name: 'Floryn', role: 'Support', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Floryn',
                 strengths: 'Penyembuhan global, perlindungan tim kuat, CC',
                 weaknesses: 'Pilihan melarikan diri terbatas, rentan, mudah di-dive',
                 counterHeroes: ['Baxia', 'Natalia', 'Chou'],
                 counterItems: ['Sea Halberd', 'Dominance Ice', 'Glowing Wand', 'Burst Damage Items'],
                 counterSpells: ['Flicker', 'Execute'],
-                tactics: 'Targetkan dia di awal teamfight, hindari berkumpul.'
+                tactics: 'Targetkan dia di awal teamfight, hindari berkumpul, terapkan anti-heal setelah burst awal karena Ultimate-nya tidak lagi menghilangkan pengurangan penyembuhan.',
+                skills: [
+                    { name: 'Pasif: Dew\'s Dance', description: 'Floryn berbagi satu equipment dengan sekutu terdekat. Skill ini memiliki jangkauan yang sangat luas.' },
+                    { name: 'Skill 1: Sow', description: 'Melemparkan energi ke musuh, memberikan damage dan menyembuhkan sekutu di area. Dapat memicu efek dari equipment yang dibagikan.' },
+                    { name: 'Skill 2: Sprout', description: 'Melepaskan bola energi yang memberikan damage dan stun.' },
+                    { name: 'Ultimate: Bloom', description: 'Menyembuhkan semua sekutu di seluruh peta, memberikan buff penyembuhan yang diterima.' }
+                ]
             },
             {
-                name: 'Fredrinn',
+                name: 'Fredrinn', role: 'Fighter/Tank', lane: 'Exp Lane/Jungle', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Fredrinn',
                 strengths: 'Sustain, damage AOE, CC, mobilitas, cooldown singkat',
                 weaknesses: 'Rentan CC, serangan dasar lambat',
                 counterHeroes: ['X.Borg', 'Karrie', 'Valir', 'Dyrroth', 'Thamuz'],
                 counterItems: ['Malefic Roar', 'Genius Wand', 'Demon Hunter Sword', 'Sea Halberd', 'Dominance Ice'],
                 counterSpells: ['Flicker', 'Purify'],
-                tactics: 'Bermain aman di awal, poke dari jauh, panggil jungler untuk gank.'
+                tactics: 'Bermain aman di awal, poke dari jauh, panggil jungler untuk gank, hindari pertarungan berkepanjangan, jangan berkumpul saat ia menggunakan Ultimate.',
+                skills: [
+                    { name: 'Pasif: Crystalline Armor', description: 'Mengumpulkan energi saat menerima damage, dapat dikonsumsi untuk skill.' },
+                    { name: 'Skill 1: Piercing Strike', description: 'Menyerang ke depan, memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Brave Assault', description: 'Melompat ke target, memberikan damage dan efek taunt.' },
+                    { name: 'Ultimate: Appraiser\'s Wrath', description: 'Mengumpulkan energi dan melepaskan ledakan damage area.' }
+                ]
             },
             {
-                name: 'Atlas',
+                name: 'Atlas', role: 'Tank', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Atlas',
                 strengths: 'Inisiasi, CC kuat, Ultimate teamfight',
                 weaknesses: 'Ultimate bisa dibatalkan, damage rendah, sulit untuk pemula',
                 counterHeroes: ['Valir', 'Karrie', 'Diggie', 'Kaja', 'Akai'],
                 counterItems: ['Malefic Roar', 'Genius Wand', 'Demon Hunter Sword', 'Corrosion Scythe', 'Winter Crown'],
                 counterSpells: ['Purify'],
-                tactics: 'Manfaatkan hero suppression, gunakan skill dash/kebal untuk melarikan diri dari Ultimate.'
+                tactics: 'Manfaatkan hero suppression (Kaja, Franco), gunakan skill dash/kebal untuk melarikan diri dari Ultimate, inisiasi pertarungan saat Ultimate-nya sudah terpakai atau pancing dia untuk menggunakannya.',
+                skills: [
+                    { name: 'Pasif: Frigid Breath', description: 'Membekukan musuh di sekitar setelah beberapa waktu.' },
+                    { name: 'Skill 1: Annihilate', description: 'Menyerang area di sekitar, memberikan damage.' },
+                    { name: 'Skill 2: Perfect Match', description: 'Melepaskan Mecha Sentry dan dash, dapat bersatu kembali untuk damage dan CC.' },
+                    { name: 'Ultimate: Fatal Links', description: 'Mengikat musuh dan menarik mereka ke lokasi target.' }
+                ]
             },
             {
-                name: 'Kimmy',
+                name: 'Kimmy', role: 'Marksman/Mage', lane: 'Gold Lane/Mid Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Kimmy',
                 strengths: 'Magic Damage tinggi, dapat menembak sambil bergerak, kuat late game',
                 weaknesses: 'Kerusakan awal game berkurang, radius serangan lebih kecil, mobilitas/slow Ult berkurang',
                 counterHeroes: ['Chou', 'Aldous', 'Hayabusa', 'Lancelot', 'Lolita'],
                 counterItems: ['Blade Armor', 'Antique Cuirass', 'Dominance Ice', 'Athena\'s Shield', 'Radiant Armor'],
                 counterSpells: ['Flicker', 'Purify'],
-                tactics: 'Manfaatkan kelemahan awal game, rentan terhadap dive dan burst.'
+                tactics: 'Manfaatkan kelemahan awal game dengan invasi hutan/gank, rentan terhadap dive dan burst karena mobilitasnya berkurang, gunakan CC keras untuk menguncinya.',
+                skills: [
+                    { name: 'Pasif: Chemist\'s Instinct', description: 'Dapat menembak sambil bergerak, menyerang dengan energi.' },
+                    { name: 'Skill 1: Energy Transformation', description: 'Mengubah serangan dasar menjadi semprotan energi.' },
+                    { name: 'Skill 2: Chemical Refinement', description: 'Dash ke arah target, memberikan damage dan immobilize.' },
+                    { name: 'Ultimate: Maximum Charge', description: 'Menembakkan misil jarak jauh yang memberikan damage area.' }
+                ]
             },
             {
-                name: 'Wanwan',
+                name: 'Wanwan', role: 'Marksman', lane: 'Gold Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Wanwan',
                 strengths: 'Mobilitas tinggi, damage berdasarkan % HP, Ultimate mematikan',
                 weaknesses: 'Rentan di awal permainan, butuh akurasi skill untuk Ult, pertumbuhan serangan fisik dikurangi',
                 counterHeroes: ['Ling', 'Esmeralda', 'Selena', 'Lylia', 'Granger', 'Guinevere', 'Harley'],
                 counterItems: ['Dominance Ice', 'Corrosion Scythe', 'Burst Damage Items', 'Crowd Control Items'],
                 counterSpells: ['Flicker', 'Purify'],
-                tactics: 'Fokus pada hero dengan CC keras atau burst damage tinggi, jangan biarkan ia mengumpulkan item.'
+                tactics: 'Fokus pada hero dengan CC keras atau burst damage tinggi, jangan biarkan ia mengumpulkan item dengan cepat, bermain agresif di awal permainan untuk menekan farming-nya.',
+                skills: [
+                    { name: 'Pasif: Tiger Pace', description: 'Menyerang Weakness Point musuh untuk membuka Ultimate.' },
+                    { name: 'Skill 1: Swallow\'s Path', description: 'Melemparkan jarum ke depan, memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Needle in Flowers', description: 'Menghilangkan semua efek CC dan dash singkat.' },
+                    { name: 'Ultimate: Crossbow of Tang', description: 'Mengunci target dan menyerang dengan panah cepat jika semua Weakness Point terbuka.' }
+                ]
             },
             {
-                name: 'Uranus',
+                name: 'Uranus', role: 'Tank', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Uranus',
                 strengths: 'Regenerasi HP tinggi, sustain kuat, poke mengganggu, CC ringan',
                 weaknesses: 'Rentan terhadap anti-heal, damage burst tinggi, dan true damage',
                 counterHeroes: ['Karrie', 'Baxia', 'Lunox', 'Valir'],
                 counterItems: ['Sea Halberd', 'Dominance Ice', 'Glowing Wand', 'True Damage Items', 'Divine Glaive'],
                 counterSpells: ['Execute', 'Flameshot'],
-                tactics: 'Prioritaskan anti-heal, hindari pertarungan panjang, gunakan true damage atau burst.'
+                tactics: 'Prioritaskan anti-heal di awal permainan, hindari pertarungan panjang dengannya, gunakan hero dengan true damage atau burst damage tinggi untuk menghabisinya dengan cepat.',
+                skills: [
+                    { name: 'Pasif: Radiance', description: 'Meningkatkan regenerasi HP berdasarkan damage yang diterima.' },
+                    { name: 'Skill 1: Ionic Orb', description: 'Melepaskan bola energi yang memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Transcendent Ward', description: 'Mendapatkan shield dan Movement Speed, memberikan damage saat dash.' },
+                    { name: 'Ultimate: Consecration', description: 'Menghapus efek slow dan CC, meningkatkan Movement Speed dan regenerasi HP.' }
+                ]
             },
             {
-                name: 'Kalea',
+                name: 'Kalea', role: 'Support/Fighter', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Kalea',
                 strengths: 'Mobilitas tinggi, inisiasi, potensi damage dan sustain (sebelum nerf)',
                 weaknesses: 'Nerf signifikan pada damage, sustain, dan mobilitas skill',
                 counterHeroes: ['Hero dengan CC keras atau burst damage tinggi'],
                 counterItems: ['Anti-Heal', 'Burst Damage Items', 'Crowd Control Items'],
                 counterSpells: ['Flicker', 'Purify'],
-                tactics: 'Fokus untuk menghabisinya dengan cepat di awal permainan, manfaatkan CC keras.'
+                tactics: 'Fokus untuk menghabisinya dengan cepat di awal permainan karena sustain-nya berkurang, manfaatkan CC keras untuk menguncinya dan mencegahnya menggunakan mobilitasnya.',
+                skills: [
+                    { name: 'Pasif: Tidal Grace', description: 'Meningkatkan Movement Speed dan regenerasi HP setelah menggunakan skill.' },
+                    { name: 'Skill 1: Aqua Spear', description: 'Melemparkan tombak air yang memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Ocean\'s Embrace', description: 'Dash ke arah target, memberikan damage dan efek knockback.' },
+                    { name: 'Ultimate: Maelstrom Fury', description: 'Menciptakan pusaran air yang menarik musuh dan memberikan damage berkelanjutan.' }
+                ]
             },
             {
-                name: 'Cici',
+                name: 'Cici', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Cici',
                 strengths: 'Mobilitas tinggi, damage berdasarkan % HP, dapat memperlambat musuh',
                 weaknesses: 'Rentan terhadap kerusakan burst dan CC',
                 counterHeroes: ['Ling', 'Lancelot', 'Saber', 'Akai', 'Yve'],
                 counterItems: ['Sea Halberd', 'Glowing Wand', 'Dominance Ice', 'Blade Armor', 'Twilight Armor'],
                 counterSpells: ['Sprint'],
-                tactics: 'Berikan CC dan burst damage, jangan biarkan ia melakukan kiting.'
+                tactics: 'Berikan CC dan burst damage, jangan biarkan ia melakukan kiting, gunakan stun untuk mengurangi mobilitasnya, hindari berkumpul saat ia menggunakan Ultimate.',
+                skills: [
+                    { name: 'Pasif: Performer\'s Delight', description: 'Mendapatkan stack yang meningkatkan Movement Speed dan Spell Vamp.' },
+                    { name: 'Skill 1: Yo-Yo Blitz', description: 'Menyerang musuh dengan Yo-Yo, memberikan damage dan dapat diulang.' },
+                    { name: 'Skill 2: Buoyant Bounce', description: 'Melompat ke arah target, memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Curtain Call', description: 'Mengikat dua hero musuh, memberikan damage dan efek slow.' }
+                ]
+            },
+            {
+                name: 'Zetian', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Zetian',
+                strengths: 'Kontrol area, penglihatan global, penarikan, stun, peningkatan Movement Speed tim',
+                weaknesses: 'Mage squishy, rentan dive saat channeling Ult',
+                counterHeroes: ['Assassin dive (Fanny, Lancelot)', 'Hero dengan Suppression (Kaja, Franco)'],
+                counterItems: ['Burst Magic Damage', 'Magic Defense'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Purify (untuk CC Zetian)'],
+                tactics: 'Manfaatkan cooldown Ultimate-nya, jangan berkumpul terlalu rapat, dive dia saat channeling Ult.',
+                skills: [
+                    { name: 'Pasif: Celestial Armament', description: 'Phoenix Crown & Celestial Robe memberikan Spell Vamp, shield, dan CC.' },
+                    { name: 'Skill 1: Phoenix Strike', description: 'Melepaskan energi ke target, dapat diulang, menarik target.' },
+                    { name: 'Skill 2: Phoenix Descent', description: 'Memanggil phoenix yang memberikan damage dan efek slow, dapat diperintahkan untuk menyerbu.' },
+                    { name: 'Ultimate: Fury of the Phoenix', description: 'Memberikan Movement Speed tim, damage global, dan stun pada musuh.' }
+                ]
+            },
+            {
+                name: 'Gloo', role: 'Tank', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Gloo',
+                strengths: 'Sustain tinggi, tekanan laning, sulit di-burst, mobilitas',
+                weaknesses: 'Rentan anti-heal, bisa di-kiting jika skill miss',
+                counterHeroes: ['Karrie', 'Dyrroth', 'Baxia'],
+                counterItems: ['Sea Halberd', 'Dominance Ice', 'True Damage Items'],
+                counterSpells: ['Execute', 'Flicker (untuk keluar dari jangkauan)'],
+                tactics: 'Fokus pada anti-heal, jangan biarkan dia menumpuk pasif terlalu banyak, burst dia sebelum dia sempat memisahkan diri.',
+                skills: [
+                    { name: 'Pasif: Sticky', description: 'Menumpuk efek yang mengurangi damage musuh.' },
+                    { name: 'Skill 1: Slam, Slam', description: 'Melepaskan Goo yang memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Grab, Grab', description: 'Menarik Goo ke arahnya, memberikan damage dan stun.' },
+                    { name: 'Ultimate: Split, Split', description: 'Berpisah menjadi Goo kecil, dapat menempel pada musuh.' }
+                ]
+            },
+            {
+                name: 'Rafaela', role: 'Support', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Rafaela',
+                strengths: 'Penyembuhan global, Movement Speed tim, pasif kebangkitan unik',
+                weaknesses: 'Squishy, damage rendah, tidak ada CC keras',
+                counterHeroes: ['Natalia', 'Chou', 'Kaja'],
+                counterItems: ['Burst Damage Items', 'Anti-Heal'],
+                counterSpells: ['Execute', 'Flicker (untuk mendekat dan burst)'],
+                tactics: 'Targetkan dia terlebih dahulu dalam teamfight, manfaatkan kelemahan mobilitasnya, jangan biarkan dia bebas memberikan healing.',
+                skills: [
+                    { name: 'Pasif: Divine Resurrection', description: 'Dapat membangkitkan sekutu yang gugur di markas.' },
+                    { name: 'Skill 1: Light of Retribution', description: 'Melepaskan bola cahaya yang memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Holy Healing', description: 'Menyembuhkan sekutu dan meningkatkan Movement Speed.' },
+                    { name: 'Ultimate: Holy Baptism', description: 'Melepaskan gelombang energi yang memberikan damage dan stun area.' }
+                ]
+            },
+            {
+                name: 'Aamon', role: 'Assassin', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Aamon',
+                strengths: 'Burst damage tinggi, mobilitas luar biasa, sulit ditangkap',
+                weaknesses: 'Squishy jika skill miss atau caught off-guard, bergantung pada camouflage',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Hero dengan CC keras'],
+                counterItems: ['Defense Items (Armor)', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri dari burst)'],
+                tactics: 'Gunakan CC keras saat dia keluar dari camouflage, jangan biarkan dia bebas melakukan pick-off.',
+                skills: [
+                    { name: 'Pasif: Invisible Armor', description: 'Mengubah damage menjadi camouflage dan Movement Speed.' },
+                    { name: 'Skill 1: Soul Shards', description: 'Melepaskan shards yang memberikan damage.' },
+                    { name: 'Skill 2: Slayer Shards', description: 'Dash ke depan, meninggalkan shards.' },
+                    { name: 'Ultimate: Phantom Shroud', description: 'Mengunci target dan melepaskan banyak shards untuk burst damage.' }
+                ]
+            },
+            {
+                name: 'Arlott', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Arlott',
+                strengths: 'Sustain, kemampuan mengejar/melarikan diri, immune CC saat Ult',
+                weaknesses: 'Bisa di-suppress saat Ult, rentan jika skill miss',
+                counterHeroes: ['Kaja', 'Franco', 'Nana'],
+                counterItems: ['Anti-Sustain Items', 'Burst Damage Items'],
+                counterSpells: ['Suppression Spells (misal Kaja Ult)', 'Purify (untuk CC Arlott)'],
+                tactics: 'Gunakan suppression untuk menghentikan Ultimate-nya, jangan biarkan dia menumpuk pasif.',
+                skills: [
+                    { name: 'Pasif: Demon Gaze', description: 'Menandai musuh yang terkena CC.' },
+                    { name: 'Skill 1: Dauntless Strike', description: 'Menyerang ke depan, memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Vengeance', description: 'Dash ke arah target yang ditandai, memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Final Slash', description: 'Menyerang area di depan, memberikan damage dan efek knockback.' }
+                ]
+            },
+            {
+                name: 'Lesley', role: 'Marksman', lane: 'Gold Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Lesley',
+                strengths: 'Crit damage tinggi, aman di laning dengan camouflage, global Ult',
+                weaknesses: 'Squishy, rentan dive jika camouflage terdeteksi, damage awal kurang',
+                counterHeroes: ['Fanny', 'Lancelot', 'Natalia', 'Chou'],
+                counterItems: ['Physical Defense Items', 'Blade Armor'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Dive dia, deteksi camouflage-nya, jangan biarkan dia farming dengan bebas.',
+                skills: [
+                    { name: 'Pasif: Lethal Shot', description: 'Memberikan damage kritikal tambahan pada serangan dasar.' },
+                    { name: 'Skill 1: Master of Camouflage', description: 'Memasuki mode camouflage, meningkatkan Movement Speed dan Physical Attack.' },
+                    { name: 'Skill 2: Tactical Grenade', description: 'Melemparkan granat yang memberikan damage dan efek knockback.' },
+                    { name: 'Ultimate: Ultimate Snipe', description: 'Mengunci target dan menembakkan peluru jarak jauh.' }
+                ]
+            },
+            {
+                name: 'Natan', role: 'Marksman', lane: 'Gold Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Natan',
+                strengths: 'Damage output tinggi, skill rotation cepat, poke',
+                weaknesses: 'Squishy, tidak ada escape skill bawaan, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Chou', 'Atlas'],
+                counterItems: ['Physical Defense Items', 'Magic Defense Items', 'Burst Damage Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Lock dia dengan CC, burst dia sebelum dia bisa membalas, manfaatkan kelemahan mobilitasnya.',
+                skills: [
+                    { name: 'Pasif: Theory of Everything', description: 'Meningkatkan Attack Speed dan Movement Speed setelah menggunakan skill.' },
+                    { name: 'Skill 1: Superposition', description: 'Menembakkan bola energi yang memberikan damage.' },
+                    { name: 'Skill 2: Interference!', description: 'Menciptakan area yang memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Entropy', description: 'Menciptakan klon yang meniru serangan Natan.' }
+                ]
+            },
+            {
+                name: 'Lylia', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Lylia',
+                strengths: 'Burst Magic Damage, mana efisien, area control',
+                weaknesses: 'Squishy, tidak ada escape skill bawaan, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Burst Damage Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Dive dia, jangan biarkan dia menumpuk Gloom, manfaatkan kelemahan mobilitasnya.',
+                skills: [
+                    { name: 'Pasif: Anger\'s Curse', description: 'Meningkatkan Movement Speed saat Gloom berada di dekatnya.' },
+                    { name: 'Skill 1: Magic Shockwave', description: 'Melepaskan gelombang energi yang memberikan damage.' },
+                    { name: 'Skill 2: Shadow Energy', description: 'Menciptakan area yang memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Black Shoes', description: 'Kembali ke lokasi sebelumnya, memulihkan HP dan Mana.' }
+                ]
+            },
+            {
+                name: 'Kadita', role: 'Mage/Assassin', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Kadita',
+                strengths: 'Burst Magic Damage, mobilitas tinggi, CC',
+                weaknesses: 'Ultimate bisa diinterupsi Suppression, skillshot reliant',
+                counterHeroes: ['Kaja', 'Franco', 'Diggie'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk menghindar)'],
+                tactics: 'Gunakan suppression untuk menghentikan Ultimate-nya, hindari berkumpul saat dia mendekat.',
+                skills: [
+                    { name: 'Pasif: Ocean Oddity', description: 'Memulihkan HP setelah menerima damage besar.' },
+                    { name: 'Skill 1: Ocean Oddity', description: 'Mengendarai ombak, memberikan damage dan efek knockup.' },
+                    { name: 'Skill 2: Breath of the Ocean', description: 'Memanggil ombak yang memberikan damage dan efek knockup.' },
+                    { name: 'Ultimate: Rough Waves', description: 'Menyelam dan melepaskan gelombang air yang memberikan damage besar.' }
+                ]
+            },
+            {
+                name: 'Kagura', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Kagura',
+                strengths: 'Shield, Control Immunity, mobilitas dengan payung, poke',
+                weaknesses: 'Squishy jika payung tidak di-manage dengan baik, skillshot reliant',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Burst Magic Damage', 'Physical Defense (jika dia build lifesteal)'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Burst dia melalui shield-nya, jangan biarkan dia bebas poke.',
+                skills: [
+                    { name: 'Pasif: Rasho Umbrella Flee', description: 'Mendapatkan shield dan efek slow pada musuh terdekat.' },
+                    { name: 'Skill 1: Seimei Umbrella Open', description: 'Melemparkan payung ke lokasi target.' },
+                    { name: 'Skill 2: Rasho Umbrella Flee', description: 'Dash ke arah payung atau ke arah yang ditentukan.' },
+                    { name: 'Ultimate: Higanbana', description: 'Menarik musuh ke arah payung dan memberikan damage area.' }
+                ]
+            },
+            {
+                name: 'Odette', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Odette',
+                strengths: 'AOE Magic Damage besar, mana efisien',
+                weaknesses: 'Immobile saat Ultimate, squishy, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Chou', 'Franco'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Purify (untuk CC Odette)'],
+                tactics: 'Dive dia, interupsi Ultimate-nya dengan CC, jangan biarkan dia bebas casting.',
+                skills: [
+                    { name: 'Pasif: Lakeshore Ambience', description: 'Skill memantul ke musuh terdekat.' },
+                    { name: 'Skill 1: Avian Authority', description: 'Memanggil angsa yang memberikan damage.' },
+                    { name: 'Skill 2: Blue Nova', description: 'Melepaskan bola energi yang memberikan damage dan immobilize.' },
+                    { name: 'Ultimate: Swan Song', description: 'Menciptakan area yang memberikan damage berkelanjutan.' }
+                ]
+            },
+            {
+                name: 'Roger', role: 'Fighter/Marksman', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Roger',
+                strengths: 'Fleksibel (MM/Fighter), burst, sustain, mobilitas',
+                weaknesses: 'Squishy di form manusia, bisa di-kiting',
+                counterHeroes: ['Chou', 'Kaja', 'Franco', 'Akai'],
+                counterItems: ['Physical Defense Items', 'Anti-Sustain Items'],
+                counterSpells: ['Flicker (untuk melarikan diri)', 'Purify (untuk CC)'],
+                tactics: 'Lock dia dengan CC, burst dia di form manusia, jangan biarkan dia bebas bertransformasi.',
+                skills: [
+                    { name: 'Pasif: Full Moon Curse', description: 'Meningkatkan damage terhadap musuh HP rendah.' },
+                    { name: 'Skill 1 (Human): Full Bore', description: 'Menembakkan peluru yang memberikan damage.' },
+                    { name: 'Skill 2 (Human): Hunter\'s Steps', description: 'Meningkatkan Movement Speed dan Attack Speed.' },
+                    { name: 'Ultimate: Wolf Transformation', description: 'Berubah menjadi serigala, meningkatkan statistik dan skill.' }
+                ]
+            },
+            {
+                name: 'Lancelot', role: 'Assassin', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Lancelot',
+                strengths: 'Burst damage tinggi, mobilitas luar biasa, invincibility frames',
+                weaknesses: 'Squishy, bergantung pada skill precision, bisa di-CC keras',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Gunakan CC keras saat dia keluar dari invincibility, jangan biarkan dia bebas melakukan pick-off.',
+                skills: [
+                    { name: 'Pasif: Soul Cutter', description: 'Meningkatkan damage setelah menyerang musuh yang tidak bertanda.' },
+                    { name: 'Skill 1: Puncture', description: 'Dash ke arah target, memberikan damage.' },
+                    { name: 'Skill 2: Thorned Rose', description: 'Menyerang area di sekitar, memberikan damage dan invincibility singkat.' },
+                    { name: 'Ultimate: Phantom Execution', description: 'Dash ke depan, memberikan damage besar pada musuh di jalur.' }
+                ]
+            },
+            {
+                name: 'Gusion', role: 'Assassin', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Gusion',
+                strengths: 'Burst damage sangat tinggi, mobilitas luar biasa',
+                weaknesses: 'Squishy, bergantung pada skill precision, bisa di-CC keras',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Gunakan CC keras saat dia mendekat, burst dia sebelum dia bisa mengeluarkan kombo penuh.',
+                skills: [
+                    { name: 'Pasif: Dagger Specialist', description: 'Memulihkan HP dan memberikan damage tambahan setelah menggunakan skill.' },
+                    { name: 'Skill 1: Sword Spike', description: 'Melemparkan dagger ke target.' },
+                    { name: 'Skill 2: Shadowblade Slaughter', description: 'Melemparkan banyak dagger ke area.' },
+                    { name: 'Ultimate: Incandescence', description: 'Reset cooldown skill dan dash.' }
+                ]
+            },
+            {
+                name: 'Nolan', role: 'Assassin', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Nolan',
+                strengths: 'Burst damage, energi sustain, mobilitas',
+                weaknesses: 'Squishy, rentan CC, bisa di-kiting',
+                counterHeroes: ['Chou', 'Khufra', 'Akai', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Lock dia dengan CC, burst dia, jangan biarkan dia bebas melakukan rotasi.',
+                skills: [
+                    { name: 'Pasif: Dimensional Rift', description: 'Meningkatkan damage dan memulihkan energi.' },
+                    { name: 'Skill 1: Expansion', description: 'Melepaskan gelombang energi yang memberikan damage.' },
+                    { name: 'Skill 2: Gauge', description: 'Dash ke arah target, memberikan damage.' },
+                    { name: 'Ultimate: Spatial Migration', description: 'Teleportasi ke lokasi target, memberikan damage area.' }
+                ]
+            },
+            {
+                name: 'Yu Zhong', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Yu Zhong',
+                strengths: 'Sustain tinggi, durabilitas di form naga, AOE damage',
+                weaknesses: 'Bisa di-kiting, rentan anti-heal, bisa di-suppress saat Ult',
+                counterHeroes: ['Karrie', 'Dyrroth', 'Baxia', 'Kaja', 'Franco'],
+                counterItems: ['Sea Halberd', 'Dominance Ice', 'True Damage Items'],
+                counterSpells: ['Suppression Spells', 'Flicker (untuk kiting)'],
+                tactics: 'Terapkan anti-heal, kiting dia, gunakan suppression untuk menghentikan Ultimate-nya.',
+                skills: [
+                    { name: 'Pasif: Cursed Touch', description: 'Memberikan damage dan memulihkan HP, menumpuk efek Sha Residue.' },
+                    { name: 'Skill 1: Dragon Tail', description: 'Memutar tubuh, memberikan damage area.' },
+                    { name: 'Skill 2: Soul Grip', description: 'Melepaskan energi yang memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Black Dragon Form', description: 'Berubah menjadi naga, meningkatkan statistik dan skill.' }
+                ]
+            },
+            {
+                name: 'Minsitthar', role: 'Fighter', lane: 'Exp Lane/Roam', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Minsitthar',
+                strengths: 'CC kuat, damage, inisiasi',
+                weaknesses: 'Bisa di-kiting, rentan burst',
+                counterHeroes: ['Hero dengan mobilitas tinggi (Ling, Lancelot)', 'Hero dengan burst damage'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri dari Ult)'],
+                tactics: 'Kiting dia, burst dia sebelum dia bisa mengunci tim.',
+                skills: [
+                    { name: 'Pasif: All United', description: 'Mendapatkan gold tambahan dari kill dan assist.' },
+                    { name: 'Skill 1: Spear of Glory', description: 'Melemparkan tombak yang menarik musuh.' },
+                    { name: 'Skill 2: Shield Assault', description: 'Menyerang dengan perisai, memberikan damage dan efek stun.' },
+                    { name: 'Ultimate: King\'s Calling', description: 'Menciptakan area yang mengunci musuh dan memberikan damage.' }
+                ]
+            },
+            {
+                name: 'X.Borg', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=X.Borg',
+                strengths: 'AOE damage, sustain dengan Firaga Armor, true damage',
+                weaknesses: 'Rentan saat Firaga Armor pecah, bisa di-kiting',
+                counterHeroes: ['Hero dengan burst damage (Gusion, Saber)', 'Hero dengan CC keras'],
+                counterItems: ['Anti-Burst Items', 'Physical Defense (setelah armor pecah)'],
+                counterSpells: ['Flicker (untuk menghindari Ult)', 'Purify (untuk CC)'],
+                tactics: 'Burst dia saat armornya pecah, hindari Ultimate-nya, kiting dia.',
+                skills: [
+                    { name: 'Pasif: Firaga Armor', description: 'Memiliki armor yang dapat pecah, memberikan damage dan true damage.' },
+                    { name: 'Skill 1: Fire Missiles', description: 'Menembakkan misil yang memberikan damage berkelanjutan.' },
+                    { name: 'Skill 2: Fire Stake', description: 'Melepaskan kait yang menarik musuh.' },
+                    { name: 'Ultimate: Last Insanity', description: 'Meledakkan diri, memberikan damage area dan true damage.' }
+                ]
+            },
+            {
+                name: 'Lapu-Lapu', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Lapu-Lapu',
+                strengths: 'Burst damage, durabilitas, CC',
+                weaknesses: 'Bisa di-suppress saat Ult, rentan kiting',
+                counterHeroes: ['Kaja', 'Franco', 'Diggie'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Suppression Spells', 'Purify (untuk CC Lapu-Lapu)'],
+                tactics: 'Gunakan suppression untuk menghentikan Ultimate-nya, kiting dia.',
+                skills: [
+                    { name: 'Pasif: Homeland Defender', description: 'Meningkatkan damage dan mendapatkan shield.' },
+                    { name: 'Skill 1: Justice Blade', description: 'Melemparkan pedang yang memberikan damage.' },
+                    { name: 'Skill 2: Brave Stance', description: 'Dash ke depan, memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Chieftain\'s Rage', description: 'Berubah menjadi mode Great Sword, meningkatkan statistik dan skill.' }
+                ]
+            },
+            {
+                name: 'Terizla', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Terizla',
+                strengths: 'Burst damage, sustain, CC',
+                weaknesses: 'Mobilitas rendah, bisa di-kiting',
+                counterHeroes: ['Hero dengan mobilitas tinggi (Ling, Lancelot)', 'Hero dengan poke'],
+                counterItems: ['Physical Defense Items', 'Anti-Sustain Items'],
+                counterSpells: ['Flicker (untuk kiting)', 'Sprint'],
+                tactics: 'Kiting dia, poke dia dari jauh, hindari Ultimate-nya.',
+                skills: [
+                    { name: 'Pasif: Body of the Martyr', description: 'Mengurangi damage yang diterima saat HP rendah.' },
+                    { name: 'Skill 1: Revenge Strike', description: 'Menyerang ke depan, memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Execution Strike', description: 'Menyerang area di depan, memberikan damage.' },
+                    { name: 'Ultimate: Penalty Zone', description: 'Menciptakan area yang menarik musuh dan memberikan damage.' }
+                ]
+            },
+            {
+                name: 'Paquito', role: 'Fighter/Assassin', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Paquito',
+                strengths: 'Burst damage, mobilitas, CC',
+                weaknesses: 'Squishy, bergantung pada kombo, bisa di-CC keras',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Gunakan CC keras untuk menghentikan kombonya, burst dia.',
+                skills: [
+                    { name: 'Pasif: Champ Stance', description: 'Meningkatkan damage dan efek skill setelah beberapa serangan.' },
+                    { name: 'Skill 1: Heavy Left Punch', description: 'Meninju ke depan, memberikan damage dan shield.' },
+                    { name: 'Skill 2: Jab', description: 'Dash ke depan, memberikan damage.' },
+                    { name: 'Ultimate: Knockout Strike', description: 'Meninju ke depan, memberikan damage dan efek knockup.' }
+                ]
+            },
+            {
+                name: 'Ruby', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Ruby',
+                strengths: 'Sustain tinggi dengan Spell Vamp, CC area, mobilitas',
+                weaknesses: 'Damage rendah, rentan anti-heal, bisa di-kiting',
+                counterHeroes: ['Baxia', 'Karrie', 'Dyrroth'],
+                counterItems: ['Sea Halberd', 'Dominance Ice', 'True Damage Items'],
+                counterSpells: ['Execute', 'Flicker (untuk kiting)'],
+                tactics: 'Terapkan anti-heal, kiting dia, burst dia.',
+                skills: [
+                    { name: 'Pasif: Let\'s Dance!', description: 'Meningkatkan Spell Vamp dan dash setelah menggunakan skill.' },
+                    { name: 'Skill 1: Be Good!', description: 'Menyerang ke depan, memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Don\'t Run, Wolf King!', description: 'Menarik musuh ke arahnya, memberikan damage dan efek stun.' },
+                    { name: 'Ultimate: I\'m Offended!', description: 'Menarik musuh di area dan memberikan damage.' }
+                ]
+            },
+            {
+                name: 'Aldous', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Aldous',
+                strengths: 'Burst damage sangat tinggi di late game, global Ult',
+                weaknesses: 'Sangat lemah di early game, rentan poke, bisa di-kiting',
+                counterHeroes: ['Chou', 'Wanwan', 'Ling', 'Esmeralda', 'Valir'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items', 'Wind of Nature', 'Winter Truncheon'],
+                counterSpells: ['Flicker (untuk melarikan diri)', 'Purify (untuk CC)'],
+                tactics: 'Poke dia di early game, jangan biarkan dia menumpuk stack, kiting dia, hindari Ult-nya dengan Flicker/Winter Truncheon.',
+                skills: [
+                    { name: 'Pasif: Contract: Transform', description: 'Meningkatkan damage serangan dasar setelah menggunakan skill.' },
+                    { name: 'Skill 1: Soul Steal', description: 'Menyerang musuh, mendapatkan stack damage permanen.' },
+                    { name: 'Skill 2: Explosive Strike', description: 'Mendapatkan shield dan efek slow pada musuh terdekat.' },
+                    { name: 'Ultimate: Contract: Chase Fate', description: 'Mengunci target dan dash ke arahnya dari jarak jauh.' }
+                ]
+            },
+            {
+                name: 'Esmeralda', role: 'Tank/Mage', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Esmeralda',
+                strengths: 'Shield sangat besar, sustain tinggi, damage',
+                weaknesses: 'Rentan true damage, rentan anti-shield, bisa di-CC keras',
+                counterHeroes: ['Karrie', 'Dyrroth', 'Chou', 'Kaja'],
+                counterItems: ['True Damage Items', 'Anti-Shield Items (misal Necklace of Durance)'],
+                counterSpells: ['Execute', 'Flicker (untuk kiting)'],
+                tactics: 'Gunakan true damage, terapkan anti-shield, burst dia dengan CC.',
+                skills: [
+                    { name: 'Pasif: Starmoon Casket', description: 'Mengubah shield musuh menjadi HP dan memberikan damage.' },
+                    { name: 'Skill 1: Frostmoon Shield', description: 'Mendapatkan shield dan Movement Speed.' },
+                    { name: 'Skill 2: Stardust Dance', description: 'Menyerang area di sekitar, memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Falling Starmoon', description: 'Melompat ke target, memberikan damage dan efek immobilize.' }
+                ]
+            },
+            {
+                name: 'Ling', role: 'Assassin', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Ling',
+                strengths: 'Mobilitas ekstrem, burst damage, sulit ditangkap',
+                weaknesses: 'Sangat squishy, bergantung pada energy, rentan CC keras, rentan vision control',
+                counterHeroes: ['Khufra', 'Minsitthar', 'Ruby', 'Chou', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items', 'Dominance Ice (jika dia build lifesteal)'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Gunakan CC keras saat dia turun dari tembok, kontrol vision di jungle, jangan biarkan dia bebas farming.',
+                skills: [
+                    { name: 'Pasif: Cloud Walker', description: 'Menggunakan tembok untuk melompat dan memulihkan energy.' },
+                    { name: 'Skill 1: Finch Poise', description: 'Melompat ke tembok, meningkatkan Movement Speed.' },
+                    { name: 'Skill 2: Defiant Sword', description: 'Dash ke arah target, memberikan damage.' },
+                    { name: 'Ultimate: Tempest of Blades', description: 'Menciptakan area pedang, memberikan damage dan efek knockup.' }
+                ]
+            },
+            {
+                name: 'Minotaur', role: 'Tank/Support', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Minotaur',
+                strengths: 'Durabilitas tinggi, sustain, AOE CC kuat',
+                weaknesses: 'Ultimate bisa diprediksi, bisa di-kiting, rentan poke',
+                counterHeroes: ['Valir', 'Chang\'e', 'Pharsa', 'Hero dengan poke jarak jauh'],
+                counterItems: ['Magic Defense Items', 'Anti-Sustain Items'],
+                counterSpells: ['Flicker (untuk kiting)', 'Purify (untuk CC)'],
+                tactics: 'Poke dia dari jauh, hindari Ultimate-nya, jangan biarkan dia masuk ke Rage mode.',
+                skills: [
+                    { name: 'Pasif: Rage Mode', description: 'Mengumpulkan Rage, meningkatkan statistik dan skill.' },
+                    { name: 'Skill 1: Despair Hammer', description: 'Mengayunkan palu, memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Motivation Roar', description: 'Menyembuhkan sekutu dan meningkatkan Attack Speed.' },
+                    { name: 'Ultimate: Minoan Fury', description: 'Menghentak tanah, memberikan damage dan efek knockup.' }
+                ]
+            },
+            {
+                name: 'Guinevere', role: 'Mage/Fighter', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Guinevere',
+                strengths: 'Burst Magic Damage, airborne CC, mobilitas',
+                weaknesses: 'Skillshot reliant, bisa di-counter Resilience, rentan dive',
+                counterHeroes: ['Chou', 'Kaja', 'Franco', 'Diggie'],
+                counterItems: ['Resilience Items (Brute Force Breastplate, Tough Boots)', 'Magic Defense Items'],
+                counterSpells: ['Purify', 'Flicker (untuk menghindar)'],
+                tactics: 'Build Resilience, hindari skill 2-nya, burst dia setelah dia menggunakan kombo.',
+                skills: [
+                    { name: 'Pasif: Super Magic', description: 'Meningkatkan damage dan memulihkan HP setelah menggunakan skill.' },
+                    { name: 'Skill 1: Energy Wave', description: 'Melepaskan gelombang energi yang memberikan damage.' },
+                    { name: 'Skill 2: Spatial Migration', description: 'Melompat ke lokasi target, memberikan damage dan efek knockup.' },
+                    { name: 'Ultimate: Violet Requiem', description: 'Menciptakan area yang memberikan damage dan efek knockup.' }
+                ]
+            },
+            {
+                name: 'Vale', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Vale',
+                strengths: 'Burst Magic Damage, airborne CC, area control',
+                weaknesses: 'Sangat squishy, tidak ada escape skill bawaan, rentan dive, bisa di-counter Resilience',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Resilience Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Dive dia, build Resilience, jangan biarkan dia bebas casting skill.',
+                skills: [
+                    { name: 'Pasif: Windtalk', description: 'Meningkatkan Movement Speed setelah menggunakan skill.' },
+                    { name: 'Skill 1: Wind Blade', description: 'Melepaskan bilah angin yang memberikan damage.' },
+                    { name: 'Skill 2: Windblow', description: 'Menciptakan area yang memberikan damage dan efek knockup.' },
+                    { name: 'Ultimate: Windstorm', description: 'Menciptakan badai yang memberikan damage besar.' }
+                ]
+            },
+            {
+                name: 'Alucard', role: 'Fighter', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Alucard',
+                strengths: 'Lifesteal tinggi, burst damage, jungle clear cepat',
+                weaknesses: 'Rentan anti-heal, rentan CC keras, bisa di-kiting',
+                counterHeroes: ['Baxia', 'Karrie', 'Dyrroth', 'Chou', 'Franco'],
+                counterItems: ['Sea Halberd', 'Dominance Ice', 'True Damage Items', 'Physical Defense Items'],
+                counterSpells: ['Execute', 'Flicker (untuk kiting)'],
+                tactics: 'Terapkan anti-heal, gunakan CC keras, kiting dia, jangan biarkan dia bebas lifesteal.',
+                skills: [
+                    { name: 'Pasif: Pursuit', description: 'Meningkatkan damage dan lifesteal setelah menggunakan skill.' },
+                    { name: 'Skill 1: Groundsplitter', description: 'Melompat ke area target, memberikan damage.' },
+                    { name: 'Skill 2: Whirling Smash', description: 'Memutar pedang, memberikan damage area.' },
+                    { name: 'Ultimate: Fission Wave', description: 'Meningkatkan lifesteal dan dapat menembakkan gelombang energi.' }
+                ]
+            },
+            {
+                name: 'Sun', role: 'Fighter', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Sun',
+                strengths: 'Damage tinggi dari klon, split push, jungle clear cepat',
+                weaknesses: 'Rentan AOE damage, rentan CC, bisa di-kiting',
+                counterHeroes: ['Pharsa', 'Chang\'e', 'Gord', 'Valir'],
+                counterItems: ['AOE Damage Items', 'Physical Defense Items'],
+                counterSpells: ['Flicker (untuk kiting)', 'Purify (untuk CC)'],
+                tactics: 'Gunakan skill AOE untuk membersihkan klonnya, jangan biarkan dia bebas split push, kiting dia.',
+                skills: [
+                    { name: 'Pasif: Simian God', description: 'Menciptakan klon saat menyerang musuh.' },
+                    { name: 'Skill 1: Endless Variety', description: 'Melemparkan tongkat yang menciptakan klon.' },
+                    { name: 'Skill 2: Swift Exchange', description: 'Dash ke arah target, meninggalkan klon.' },
+                    { name: 'Ultimate: Clone Techniques', description: 'Menciptakan klon yang kuat dan meningkatkan statistik.' }
+                ]
+            },
+            {
+                name: 'Saber', role: 'Assassin', lane: 'Jungle/Roam', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Saber',
+                strengths: 'Burst damage sangat tinggi, single target lockdown',
+                weaknesses: 'Squishy, rentan setelah kombo, bisa di-CC keras',
+                counterHeroes: ['Chou', 'Kaja', 'Franco', 'Nana'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items', 'Winter Truncheon'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Build defense, gunakan Winter Truncheon saat dia ult, burst dia setelah dia menggunakan kombo.',
+                skills: [
+                    { name: 'Pasif: Enemy\'s Bane', description: 'Mengurangi Physical Defense target.' },
+                    { name: 'Skill 1: Flying Sword', description: 'Melepaskan pedang yang mengelilingi dan memberikan damage.' },
+                    { name: 'Skill 2: Charge', description: 'Dash ke arah target, memberikan damage.' },
+                    { name: 'Ultimate: Triple Sweep', description: 'Mengunci target dan memberikan damage burst tinggi.' }
+                ]
+            },
+            {
+                name: 'Fanny', role: 'Assassin', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Fanny',
+                strengths: 'Mobilitas ekstrem, burst damage tinggi',
+                weaknesses: 'Sangat bergantung pada energy, squishy, rentan CC keras',
+                counterHeroes: ['Khufra', 'Minsitthar', 'Ruby', 'Chou', 'Franco'],
+                counterItems: ['Energy Reduction Items (jarang ada)', 'Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Drain energinya, gunakan CC keras saat dia mendekat, jangan biarkan dia bebas rotasi.',
+                skills: [
+                    { name: 'Pasif: Air Superiority', description: 'Meningkatkan damage saat terbang.' },
+                    { name: 'Skill 1: Steel Cable', description: 'Melemparkan kabel untuk terbang ke tembok.' },
+                    { name: 'Skill 2: Cut Throat', description: 'Menyerang musuh di dekatnya saat terbang.' },
+                    { name: 'Ultimate: Blade Dance', description: 'Menyerang target dengan cepat, memberikan damage.' }
+                ]
+            },
+            {
+                name: 'Hayabusa', role: 'Assassin', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Hayabusa',
+                strengths: 'Mobilitas tinggi, burst damage, split push',
+                weaknesses: 'Squishy, rentan jika bayangan hilang, bisa di-CC keras',
+                counterHeroes: ['Khufra', 'Minsitthar', 'Ruby', 'Chou', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Lock dia dengan CC, burst dia saat dia keluar dari bayangan, kontrol vision di jungle.',
+                skills: [
+                    { name: 'Pasif: Ninjutsu: Trace of Shadow', description: 'Meningkatkan damage setelah menggunakan skill.' },
+                    { name: 'Skill 1: Phantom Shuriken', description: 'Melemparkan shuriken yang memberikan damage.' },
+                    { name: 'Skill 2: Quad Shadow', description: 'Melepaskan bayangan dan dash ke lokasi target.' },
+                    { name: 'Ultimate: Ougi: Shadow Kill', description: 'Menyerang musuh di area dengan bayangan.' }
+                ]
+            },
+            {
+                name: 'Selena', role: 'Assassin/Mage', lane: 'Mid Lane/Roam', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Selena',
+                strengths: 'Burst damage tinggi, CC jarak jauh (panah), vision',
+                weaknesses: 'Squishy, bergantung pada skillshot (panah), rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk menghindar)'],
+                tactics: 'Dodge panah-nya, dive dia, jangan biarkan dia bebas poke.',
+                skills: [
+                    { name: 'Pasif: Symbiosis', description: 'Dapat berubah antara mode Elven dan Abyssal.' },
+                    { name: 'Skill 1 (Elven): Abyssal Arrow', description: 'Melemparkan panah yang memberikan damage dan efek stun.' },
+                    { name: 'Skill 2 (Elven): Abyssal Trap', description: 'Memasang jebakan yang memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Primal Darkness', description: 'Berubah mode, mereset cooldown skill.' }
+                ]
+            },
+            {
+                name: 'Zhuxin', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Zhuxin',
+                strengths: 'Magic Damage tinggi, area control, vision',
+                weaknesses: 'Squishy, vision dari skill 2 kini terbatas, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Dive dia, manfaatkan kelemahan vision-nya di semak.',
+                skills: [
+                    { name: 'Pasif: Flowing Light', description: 'Meningkatkan damage skill setelah menggunakan skill.' },
+                    { name: 'Skill 1: Whispering Bloom', description: 'Melepaskan energi yang memberikan damage.' },
+                    { name: 'Skill 2: Blooming Soul', description: 'Menciptakan area yang memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Soul Bloom', description: 'Menciptakan area yang memberikan damage besar dan efek stun.' }
+                ]
+            },
+            {
+                name: 'Luo Yi', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Luo Yi',
+                strengths: 'AOE Magic Damage, CC, global teleport',
+                weaknesses: 'Squishy, posisi teleport bisa terungkap',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Dive dia, manfaatkan posisi teleportnya yang terungkap.',
+                skills: [
+                    { name: 'Pasif: Duality', description: 'Meningkatkan damage dan efek slow setelah menggunakan skill.' },
+                    { name: 'Skill 1: Dispersion', description: 'Melepaskan bola energi yang memberikan damage.' },
+                    { name: 'Skill 2: Rotation', description: 'Menciptakan area yang menarik musuh dan memberikan damage.' },
+                    { name: 'Ultimate: Diversion', description: 'Teleportasi ke lokasi target di peta.' }
+                ]
+            },
+            {
+                name: 'Chip', role: 'Support/Tank', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Chip',
+                strengths: 'Global mobilitas, teamfight utility, CC',
+                weaknesses: 'Squishy, rentan saat Ult foreswing, posisi terungkap',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Punish Ult foreswing-nya, dive dia.',
+                skills: [
+                    { name: 'Pasif: Network', description: 'Meningkatkan Movement Speed dan mendapatkan shield.' },
+                    { name: 'Skill 1: Overload', description: 'Menyerang area di sekitar, memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Warp', description: 'Dash ke arah target, memberikan damage.' },
+                    { name: 'Ultimate: Universal Link', description: 'Menciptakan portal yang dapat digunakan oleh sekutu.' }
+                ]
+            },
+            {
+                name: 'Mathilda', role: 'Support/Assassin', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Mathilda',
+                strengths: 'Mobilitas tinggi, shield, poke',
+                weaknesses: 'Squishy, shield berkurang, rentan burst',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Burst Damage Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Burst dia, jangan biarkan dia bebas poke.',
+                skills: [
+                    { name: 'Pasif: Ancestral Guidance', description: 'Meningkatkan Movement Speed dan damage setelah menggunakan skill.' },
+                    { name: 'Skill 1: Soul Bloom', description: 'Melepaskan energi yang memberikan damage.' },
+                    { name: 'Skill 2: Guiding Wind', description: 'Dash ke arah target, memberikan shield dan Movement Speed.' },
+                    { name: 'Ultimate: Circling Eagle', description: 'Terbang di sekitar target, memberikan damage dan efek knockback.' }
+                ]
+            },
+            {
+                name: 'Angela', role: 'Support', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Angela',
+                strengths: 'Global support, shield, heal, CC',
+                weaknesses: 'Squishy, Ult shield berkurang, rentan dive',
+                counterHeroes: ['Natalia', 'Chou', 'Kaja'],
+                counterItems: ['Burst Damage Items', 'Anti-Heal'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Targetkan dia terlebih dahulu, burst dia, terapkan anti-heal.',
+                skills: [
+                    { name: 'Pasif: Smart Heart', description: 'Meningkatkan Movement Speed saat menggunakan skill.' },
+                    { name: 'Skill 1: Love Waves', description: 'Melepaskan gelombang energi yang memberikan damage dan menyembuhkan sekutu.' },
+                    { name: 'Skill 2: Puppet-on-a-String', description: 'Mengikat target, memberikan damage dan efek immobilize.' },
+                    { name: 'Ultimate: Heartguard', description: 'Memasuki tubuh sekutu, memberikan shield dan dapat menggunakan skill.' }
+                ]
+            },
+            {
+                name: 'Baxia', role: 'Tank', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Baxia',
+                strengths: 'Anti-heal, durabilitas, mobilitas',
+                weaknesses: 'Nerf anti-heal, rentan true damage, bisa di-kiting',
+                counterHeroes: ['Karrie', 'Dyrroth', 'Lunox'],
+                counterItems: ['True Damage Items', 'Anti-Sustain Items'],
+                counterSpells: ['Flicker (untuk kiting)', 'Execute'],
+                tactics: 'Gunakan true damage, kiting dia, jangan biarkan dia mendekat.',
+                skills: [
+                    { name: 'Pasif: Baxia Mark', description: 'Mengurangi shield dan regenerasi HP musuh.' },
+                    { name: 'Skill 1: Baxia-Shield Unity', description: 'Berubah menjadi roda dan dash ke depan.' },
+                    { name: 'Skill 2: Shield of Spirit', description: 'Melemparkan shield yang memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Tortoise\'s Puissance', description: 'Menciptakan area yang memberikan damage dan efek slow.' }
+                ]
+            },
+            {
+                name: 'Hanzo', role: 'Assassin', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Hanzo',
+                strengths: 'Jungle clear cepat, pick-off dengan Ult, split push',
+                weaknesses: 'Rentan saat Ult body terpisah, Ult cooldown lebih lama (kecuali objektif/hero)',
+                counterHeroes: ['Natalia', 'Aldous', 'Fanny'],
+                counterItems: ['Vision Items', 'Burst Damage Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Cari tubuh aslinya, burst dia, kontrol vision.',
+                skills: [
+                    { name: 'Pasif: Ame no Habakiri', description: 'Mengumpulkan Demon Blood dari unit yang terbunuh.' },
+                    { name: 'Skill 1: Ninjutsu: Demon Feast', description: 'Menyerang area di depan, memberikan damage.' },
+                    { name: 'Skill 2: Ninjutsu: Soul Reap', description: 'Melemparkan shuriken yang memberikan damage.' },
+                    { name: 'Ultimate: Kinjutsu: Pinnacle Ninja', description: 'Berubah menjadi Demon Pneuma, meninggalkan tubuh aslinya.' }
+                ]
+            },
+            {
+                name: 'Freya', role: 'Fighter', lane: 'Exp Lane/Jungle', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Freya',
+                strengths: 'Burst damage, sustain, CC',
+                weaknesses: 'Rentan CC, damage ke creep berkurang',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Gunakan CC keras, burst dia, manfaatkan kelemahan clear creepnya.',
+                skills: [
+                    { name: 'Pasif: Spirit Combo', description: 'Meningkatkan Attack Speed setelah menggunakan skill.' },
+                    { name: 'Skill 1: Wings of Faith', description: 'Melompat ke lokasi target, memberikan damage.' },
+                    { name: 'Skill 2: Godspeed Strike', description: 'Menyerang area di depan, memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Valkyrie', description: 'Meningkatkan statistik dan mendapatkan shield.' }
+                ]
+            },
+            {
+                name: 'Alpha', role: 'Fighter', lane: 'Jungle/Exp Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Alpha',
+                strengths: 'Sustain, damage, CC',
+                weaknesses: 'Rentan CC, damage ke creep berkurang',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Gunakan CC keras, burst dia, manfaatkan kelemahan clear creepnya.',
+                skills: [
+                    { name: 'Pasif: Beta, Advance!', description: 'Beta menyerang musuh yang terkena skill Alpha.' },
+                    { name: 'Skill 1: Rotary Impact', description: 'Melemparkan Beta yang memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Force Swing', description: 'Mengayunkan Beta, memberikan damage dan memulihkan HP.' },
+                    { name: 'Ultimate: Spear of Alpha', description: 'Melompat ke target, memberikan damage dan efek stun.' }
+                ]
+            },
+            {
+                name: 'Jawhead', role: 'Fighter', lane: 'Roam/Exp Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Jawhead',
+                strengths: 'CC, inisiasi, damage',
+                weaknesses: 'Rentan CC, damage ke creep terbatas',
+                counterHeroes: ['Diggie', 'Purify users', 'Hero dengan CC keras'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Gunakan Purify untuk menghindari lemparan, burst dia.',
+                skills: [
+                    { name: 'Pasif: Mecha Suppression', description: 'Meningkatkan damage serangan dasar.' },
+                    { name: 'Skill 1: Smart Missiles', description: 'Menembakkan misil yang memberikan damage.' },
+                    { name: 'Skill 2: Ejector', description: 'Melemparkan target ke arah yang ditentukan.' },
+                    { name: 'Ultimate: Unstoppable Force', description: 'Dash ke arah target, memberikan damage dan efek knockback.' }
+                ]
+            },
+            {
+                name: 'Julian', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Julian',
+                strengths: 'Burst damage, mobilitas, sustain',
+                weaknesses: 'Squishy, bergantung pada kombo, damage ke creep terbatas',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Gunakan CC keras, burst dia, manfaatkan kelemahan clear creepnya.',
+                skills: [
+                    { name: 'Pasif: Smith\'s Legacy', description: 'Meningkatkan damage skill setelah menggunakan skill.' },
+                    { name: 'Skill 1: Sword', description: 'Melemparkan pedang yang memberikan damage.' },
+                    { name: 'Skill 2: Chain', description: 'Melemparkan rantai yang memberikan damage dan efek immobilize.' },
+                    { name: 'Ultimate: Enhanced', description: 'Meningkatkan skill dasar menjadi versi yang lebih kuat.' }
+                ]
+            },
+            {
+                name: 'Granger', role: 'Marksman', lane: 'Gold Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Granger',
+                strengths: 'Burst damage, poke, mobilitas',
+                weaknesses: 'Squishy, nerf damage dan mobilitas',
+                counterHeroes: ['Chou', 'Aldous', 'Hayabusa', 'Lancelot', 'Lolita'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Manfaatkan nerf-nya, burst dia, jangan biarkan dia bebas poke.',
+                skills: [
+                    { name: 'Pasif: Caprice', description: 'Setiap serangan dasar ke-6 memberikan damage kritikal.' },
+                    { name: 'Skill 1: Rhapsody', description: 'Menembakkan peluru yang memberikan damage.' },
+                    { name: 'Skill 2: Rondo', description: 'Dash ke depan, memberikan damage.' },
+                    { name: 'Ultimate: Death Sonata', description: 'Menembakkan peluru jarak jauh yang memberikan damage besar.' }
+                ]
+            },
+            {
+                name: 'Badang', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Badang',
+                strengths: 'Burst damage, CC, dapat mengunci musuh di tembok',
+                weaknesses: 'Ultimate bisa diinterupsi, nerf cooldown skill 2',
+                counterHeroes: ['Kaja', 'Franco', 'Diggie'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Gunakan Purify/Suppression untuk menghentikan Ultimate-nya, hindari tembok.',
+                skills: [
+                    { name: 'Pasif: Fist Break', description: 'Meningkatkan damage serangan dasar setelah menggunakan skill.' },
+                    { name: 'Skill 1: Fist Break', description: 'Meninju ke depan, memberikan damage dan efek slow.' },
+                    { name: 'Skill 2: Fist Crack', description: 'Menciptakan tembok yang memberikan damage dan efek knockback.' },
+                    { name: 'Ultimate: Fist Barrage', description: 'Meninju dengan cepat, memberikan damage besar dan efek stun.' }
+                ]
+            },
+            {
+                name: 'Gord', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Gord',
+                strengths: 'AOE Magic Damage, CC, kontrol Ultimate lebih baik',
+                weaknesses: 'Immobile saat Ultimate, squishy, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Chou', 'Franco'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Purify (untuk CC)'],
+                tactics: 'Dive dia, interupsi Ultimate-nya dengan CC.',
+                skills: [
+                    { name: 'Pasif: Mystic Injunction', description: 'Meningkatkan damage skill setelah mengenai musuh.' },
+                    { name: 'Skill 1: Mystic Projectile', description: 'Melemparkan bola energi yang memberikan damage dan efek stun.' },
+                    { name: 'Skill 2: Mystic Injunction', description: 'Menciptakan area yang memberikan damage berkelanjutan.' },
+                    { name: 'Ultimate: Mystic Gush', description: 'Menembakkan laser yang memberikan damage besar.' }
+                ]
+            },
+            {
+                name: 'Lunox', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Lunox',
+                strengths: 'Burst Magic Damage, sustain, mobilitas',
+                weaknesses: 'Squishy, bergantung pada mode, kombo berubah',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Burst dia, jangan biarkan dia bebas berpindah mode.',
+                skills: [
+                    { name: 'Pasif: Dreamland Twist', description: 'Dapat berubah antara mode Light dan Dark.' },
+                    { name: 'Skill 1: Starlight Pulse', description: 'Melepaskan energi cahaya yang memberikan damage dan menyembuhkan sekutu.' },
+                    { name: 'Skill 2: Chaos Assault', description: 'Melepaskan energi gelap yang memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Order/Chaos', description: 'Berubah mode, memberikan invincibility atau damage area.' }
+                ]
+            },
+            {
+                name: 'Barats', role: 'Tank/Fighter', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Barats',
+                strengths: 'Durabilitas, damage, CC',
+                weaknesses: 'Rentan CC, bisa di-kiting, nerf Resilience',
+                counterHeroes: ['Karrie', 'Dyrroth', 'Baxia'],
+                counterItems: ['Sea Halberd', 'Dominance Ice', 'True Damage Items'],
+                counterSpells: ['Flicker (untuk kiting)', 'Execute'],
+                tactics: 'Kiting dia, terapkan anti-heal, burst dia.',
+                skills: [
+                    { name: 'Pasif: I Am Big!', description: 'Meningkatkan ukuran dan statistik setelah menggunakan skill.' },
+                    { name: 'Skill 1: Missile Expert', description: 'Menembakkan misil yang memberikan damage.' },
+                    { name: 'Skill 2: Detona\'s Welcome', description: 'Melompat ke lokasi target, memberikan damage dan efek knockback.' },
+                    { name: 'Ultimate: Detona\'s Welcome', description: 'Menelan target dan melemparkannya ke arah yang ditentukan.' }
+                ]
+            },
+            {
+                name: 'Estes', role: 'Support', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Estes',
+                strengths: 'Penyembuhan tinggi, sustain tim, Hybrid Defense buff',
+                weaknesses: 'Squishy, rentan anti-heal, tidak ada CC keras',
+                counterHeroes: ['Baxia', 'Natalia', 'Chou'],
+                counterItems: ['Sea Halberd', 'Dominance Ice', 'Glowing Wand', 'Burst Damage Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Targetkan dia terlebih dahulu, terapkan anti-heal, burst dia.',
+                skills: [
+                    { name: 'Pasif: Code of Moon Elves', description: 'Meningkatkan damage skill setelah menggunakan skill.' },
+                    { name: 'Skill 1: Moonlight Immersion', description: 'Menyembuhkan sekutu dan memberikan damage pada musuh.' },
+                    { name: 'Skill 2: Domain of Moon Goddess', description: 'Menciptakan area yang memberikan damage dan efek slow.' },
+                    { name: 'Ultimate: Blessing of Moon Goddess', description: 'Menyembuhkan sekutu secara berkelanjutan.' }
+                ]
+            },
+            {
+                name: 'Carmilla', role: 'Support/Tank', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Carmilla',
+                strengths: 'Sustain, CC, slow',
+                weaknesses: 'Rentan burst, skill 1 berubah',
+                counterHeroes: ['Hero dengan burst damage', 'Hero dengan CC keras'],
+                counterItems: ['Anti-Sustain Items', 'Burst Damage Items'],
+                counterSpells: ['Flicker', 'Purify'],
+                tactics: 'Burst dia, jangan biarkan dia menumpuk pasif.',
+                skills: [
+                    { name: 'Pasif: Vampire Pact', description: 'Mencuri Physical & Magic Defense musuh.' },
+                    { name: 'Skill 1: Crimson Flower', description: 'Memutar bunga yang memberikan damage dan memulihkan HP.' },
+                    { name: 'Skill 2: Blood Bath', description: 'Dash ke arah target, memberikan damage dan efek stun.' },
+                    { name: 'Ultimate: Curse of Blood', description: 'Mengikat musuh, menyebarkan damage dan efek CC.' }
+                ]
+            },
+            {
+                name: 'Benedetta', role: 'Assassin/Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Benedetta',
+                strengths: 'Mobilitas tinggi, burst damage, invincibility frames',
+                weaknesses: 'Squishy, skillshot reliant, bisa di-CC keras',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Gunakan CC keras, burst dia saat invincibility-nya habis.',
+                skills: [
+                    { name: 'Pasif: Elapsed Daytime', description: 'Mengisi energi untuk dash dan serangan dasar yang diperkuat.' },
+                    { name: 'Skill 1: Phantom Slash', description: 'Dash ke depan, memberikan damage.' },
+                    { name: 'Skill 2: An Eye For An Eye', description: 'Mendapatkan invincibility dan memberikan damage.' },
+                    { name: 'Ultimate: Alecto: Final Blow', description: 'Dash ke depan, memberikan damage besar dan efek slow.' }
+                ]
+            },
+            {
+                name: 'Grock', role: 'Tank/Fighter', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Grock',
+                strengths: 'Durabilitas tinggi, damage, CC, reset Ult',
+                weaknesses: 'Rentan CC, Ult bisa dihindari',
+                counterHeroes: ['Valir', 'Diggie', 'Kaja'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk kiting)', 'Purify (untuk CC)'],
+                tactics: 'Kiting dia, hindari tembok, burst dia.',
+                skills: [
+                    { name: 'Pasif: Ancestral Gift', description: 'Meningkatkan Physical Defense dan regenerasi HP di dekat tembok.' },
+                    { name: 'Skill 1: Power of Nature', description: 'Mengumpulkan energi dan menyerang ke depan.' },
+                    { name: 'Skill 2: Guardian\'s Barrier', description: 'Menciptakan tembok yang memberikan damage dan efek knockback.' },
+                    { name: 'Ultimate: Wild Charge', description: 'Dash ke depan, memberikan damage dan efek knockup.' }
+                ]
+            },
+            {
+                name: 'Yi Sun-shin', role: 'Assassin/Marksman', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Yi+Sun-shin',
+                strengths: 'Fleksibel (melee/ranged), burst, mobilitas, global Ult',
+                weaknesses: 'Squishy, bergantung pada positioning, bisa di-CC keras',
+                counterHeroes: ['Chou', 'Kaja', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Lock dia dengan CC, burst dia, manfaatkan cooldown Ult globalnya.'
+            },
+            {
+                name: 'Hayabusa', role: 'Assassin', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Hayabusa',
+                strengths: 'Mobilitas tinggi, burst damage, split push',
+                weaknesses: 'Squishy, rentan jika bayangan hilang, bisa di-CC keras',
+                counterHeroes: ['Khufra', 'Minsitthar', 'Ruby', 'Chou', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
+                tactics: 'Lock dia dengan CC, burst dia saat dia keluar dari bayangan, kontrol vision di jungle.'
+            },
+            {
+                name: 'Lolita', role: 'Support/Tank', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Lolita',
+                strengths: 'Shield, CC, inisiasi, dapat memblokir proyektil',
+                weaknesses: 'Ultimate bisa diinterupsi, skillshot reliant',
+                counterHeroes: ['Diggie', 'Kaja', 'Franco'],
+                counterItems: ['Anti-Shield Items', 'Burst Damage Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Interupsi Ultimate-nya, jangan biarkan dia memblokir skill Anda.'
+            },
+            {
+                name: 'Diggie', role: 'Support', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Diggie',
+                strengths: 'Anti-CC, poke, vision, mobilitas',
+                weaknesses: 'Squishy, damage rendah, rentan burst',
+                counterHeroes: ['Natalia', 'Saber', 'Gusion'],
+                counterItems: ['Burst Damage Items'],
+                counterSpells: ['Execute', 'Flicker'],
+                tactics: 'Burst dia, jangan biarkan dia bebas memberikan anti-CC.'
+            },
+            {
+                name: 'Ixia', role: 'Marksman', lane: 'Gold Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Ixia',
+                strengths: 'AOE damage tinggi, poke, lifesteal',
+                weaknesses: 'Immobile, squishy, rentan dive',
+                counterHeroes: ['Fanny', 'Lancelot', 'Chou'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Dive dia, hindari area skillnya.'
+            },
+            {
+                name: 'Alice', role: 'Mage/Tank', lane: 'Exp Lane/Jungle', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Alice',
+                strengths: 'Sustain, AOE damage, mobilitas',
+                weaknesses: 'Mana hungry, rentan anti-heal, bisa di-kiting',
+                counterHeroes: ['Baxia', 'Karrie', 'Dyrroth'],
+                counterItems: ['Anti-Heal', 'True Damage Items'],
+                counterSpells: ['Execute', 'Flicker'],
+                tactics: 'Terapkan anti-heal, kiting dia.'
+            },
+            {
+                name: 'Johnson', role: 'Tank/Support', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Johnson',
+                strengths: 'Inisiasi global, CC, durabilitas',
+                weaknesses: 'Ultimate bisa dihindari, rentan di awal game',
+                counterHeroes: ['Diggie', 'Kaja', 'Franco'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Hindari mobilnya, burst dia setelah dia keluar dari mobil.'
+            },
+            {
+                name: 'Lunox', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Lunox',
+                strengths: 'Burst Magic Damage, sustain, mobilitas',
+                weaknesses: 'Squishy, bergantung pada mode, kombo berubah',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker (untuk mendekat)', 'Execute'],
+                tactics: 'Burst dia, jangan biarkan dia bebas berpindah mode.'
+            },
+            {
+                name: 'Beatrix', role: 'Marksman', lane: 'Gold Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Beatrix',
+                strengths: 'Damage output tinggi, fleksibel dengan banyak senjata',
+                weaknesses: 'Squishy, skillshot reliant, bergantung pada mana',
+                counterHeroes: ['Fanny', 'Lancelot', 'Chou'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Dive dia, hindari skill-nya, manfaatkan mana-nya yang terbatas.'
+            },
+            {
+                name: 'Khaleed', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Khaleed',
+                strengths: 'Sustain, AOE damage, CC',
+                weaknesses: 'Rentan anti-heal, Ultimate bisa diinterupsi',
+                counterHeroes: ['Baxia', 'Karrie', 'Dyrroth'],
+                counterItems: ['Anti-Heal', 'True Damage Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Terapkan anti-heal, interupsi Ultimate-nya.'
+            },
+            {
+                name: 'Cecilion', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Cecilion',
+                strengths: 'Damage sangat tinggi di late game, AOE CC',
+                weaknesses: 'Sangat lemah di early game, immobile, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Dive dia di early game, jangan biarkan dia menumpuk stack.'
+            },
+            {
+                name: 'Akai', role: 'Tank', lane: 'Roam', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Akai',
+                strengths: 'CC kuat, inisiasi, durabilitas',
+                weaknesses: 'Ultimate bisa di-kiting, rentan poke',
+                counterHeroes: ['Valir', 'Diggie', 'Chang\'e'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Purify'],
+                tactics: 'Kiting dia, hindari tembok saat dia Ult.'
+            },
+            {
+                name: 'Cyclops', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Cyclops',
+                strengths: 'Burst Magic Damage, cooldown cepat, CC',
+                weaknesses: 'Squishy, tidak ada escape skill bawaan',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Dive dia, burst dia sebelum dia bisa menggunakan skill lagi.'
+            },
+            {
+                name: 'Eudora', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Eudora',
+                strengths: 'Burst Magic Damage sangat tinggi, CC instan',
+                weaknesses: 'Sangat squishy, tidak ada escape skill bawaan, mudah di-gank',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Purify'],
+                tactics: 'Dive dia, jangan biarkan dia mengunci Anda dengan CC.'
+            },
+            {
+                name: 'Yve', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Yve',
+                strengths: 'AOE Magic Damage besar, area control, global vision',
+                weaknesses: 'Immobile saat Ultimate, squishy, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Chou', 'Franco'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Purify'],
+                tactics: 'Dive dia, interupsi Ultimate-nya dengan CC.'
+            },
+            {
+                name: 'Harith', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Harith',
+                strengths: 'Burst Magic Damage, mobilitas tinggi, shield',
+                weaknesses: 'Mana hungry, rentan CC keras, bisa di-kiting',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Gunakan CC keras, drain mana-nya, burst dia.'
+            },
+            {
+                name: 'Hilda', role: 'Fighter/Tank', lane: 'Exp Lane/Roam', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Hilda',
+                strengths: 'Sustain, damage, vision di semak, CC',
+                weaknesses: 'Rentan di luar semak, bisa di-kiting',
+                counterHeroes: ['Valir', 'Chang\'e', 'Pharsa'],
+                counterItems: ['Anti-Sustain Items', 'True Damage Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Hindari semak, kiting dia, burst dia di luar semak.'
+            },
+            {
+                name: 'Karina', role: 'Assassin', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Karina',
+                strengths: 'Burst Magic Damage, reset skill, invincibility frames',
+                weaknesses: 'Squishy, rentan CC keras, bergantung pada kill',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Gunakan CC keras, burst dia sebelum dia bisa reset skill.'
+            },
+            {
+                name: 'Chou', role: 'Fighter', lane: 'Exp Lane/Roam', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Chou',
+                strengths: 'Mobilitas tinggi, CC kuat, invincibility frames, dapat mengunci satu target',
+                weaknesses: 'Skillshot reliant, bisa di-kiting, rentan burst jika skill miss',
+                counterHeroes: ['Diggie', 'Nana', 'Valir'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Gunakan Purify saat dia mendekat, kiting dia, burst dia.'
+            },
+            {
+                name: 'Yin', role: 'Fighter/Assassin', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Yin',
+                strengths: 'Single target lockdown, burst damage, immune CC di Ultimate',
+                weaknesses: 'Rentan di luar Ultimate, bisa di-kiting, bergantung pada item',
+                counterHeroes: ['Diggie', 'Nana', 'Valir'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Hindari Ultimate-nya, burst dia di luar Ultimate.'
+            },
+            {
+                name: 'Hanabi', role: 'Marksman', lane: 'Gold Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Hanabi',
+                strengths: 'AOE damage, lifesteal, CC',
+                weaknesses: 'Immobile, squishy, rentan dive',
+                counterHeroes: ['Fanny', 'Lancelot', 'Chou'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Dive dia, hindari skill-nya, manfaatkan mobilitasnya yang rendah.'
+            },
+            {
+                name: 'Bane', role: 'Fighter/Mage', lane: 'Exp Lane/Jungle', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Bane',
+                strengths: 'Push tower cepat, sustain, AOE damage',
+                weaknesses: 'Rentan CC, bisa di-kiting',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby'],
+                counterItems: ['Anti-Sustain Items', 'Physical Defense Items'],
+                counterSpells: ['Flicker', 'Purify'],
+                tactics: 'Kiting dia, jangan biarkan dia push tower dengan bebas.'
+            },
+            {
+                name: 'Zhask', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Zhask',
+                strengths: 'AOE damage, area control, push tower cepat',
+                weaknesses: 'Immobile, squishy, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Dive dia, hancurkan Nightmaric Spawn-nya.'
+            },
+            {
+                name: 'Leomord', role: 'Fighter', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Leomord',
+                strengths: 'Burst damage, sustain, mobilitas dengan kuda',
+                weaknesses: 'Rentan CC keras, bisa di-kiting',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Gunakan CC keras, burst dia saat dia turun dari kuda.'
+            },
+            {
+                name: 'Edith', role: 'Tank/Marksman', lane: 'Exp Lane/Roam', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Edith',
+                strengths: 'Fleksibel (Tank/MM), CC, durabilitas',
+                weaknesses: 'Rentan anti-heal di mode MM, bisa di-kiting',
+                counterHeroes: ['Karrie', 'Baxia', 'Dyrroth'],
+                counterItems: ['Anti-Heal', 'True Damage Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Terapkan anti-heal di mode MM, kiting dia.'
+            },
+            {
+                name: 'Dyrroth', role: 'Fighter', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Dyrroth',
+                strengths: 'Burst damage, pengurangan armor, sustain',
+                weaknesses: 'Rentan CC, bisa di-kiting',
+                counterHeroes: ['Valir', 'Chang\'e', 'Pharsa'],
+                counterItems: ['Physical Defense Items', 'Anti-Sustain Items'],
+                counterSpells: ['Flicker', 'Purify'],
+                tactics: 'Kiting dia, hindari skill-nya, burst dia.'
+            },
+            {
+                name: 'Aurora', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Aurora',
+                strengths: 'Burst Magic Damage, CC instan',
+                weaknesses: 'Sangat squishy, tidak ada escape skill bawaan, bergantung pada stack',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Purify'],
+                tactics: 'Dive dia, jangan biarkan dia menumpuk stack.'
+            },
+            {
+                name: 'Valir', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Valir',
+                strengths: 'Poke, AOE damage, anti-dash CC',
+                weaknesses: 'Squishy, tidak ada escape skill bawaan, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Dive dia, jangan biarkan dia bebas poke.'
+            },
+            {
+                name: 'Zilong', role: 'Fighter/Assassin', lane: 'Exp Lane', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Zilong',
+                strengths: 'Push tower cepat, burst damage, mobilitas',
+                weaknesses: 'Squishy, rentan CC keras, mudah di-gank',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Gunakan CC keras, jangan biarkan dia bebas split push.'
+            },
+            {
+                name: 'Vexana', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Vexana',
+                strengths: 'AOE Magic Damage, CC, summon',
+                weaknesses: 'Immobile, squishy, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Dive dia, hindari skill-nya.'
+            },
+            {
+                name: 'Aulus', role: 'Fighter', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Aulus',
+                strengths: 'Damage tinggi, sustain, jungle clear cepat',
+                weaknesses: 'Rentan CC, bisa di-kiting',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Gunakan CC keras, kiting dia.'
+            },
+            {
+                name: 'Claude', role: 'Marksman', lane: 'Gold Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Claude',
+                strengths: 'Damage output tinggi, mobilitas, AOE damage',
+                weaknesses: 'Squishy, bergantung pada item, rentan CC',
+                counterHeroes: ['Chou', 'Kaja', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Purify'],
+                tactics: 'Lock dia dengan CC, burst dia.'
+            },
+            {
+                name: 'Harley', role: 'Assassin/Mage', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/337BFF/111827?text=Harley',
+                strengths: 'Burst Magic Damage, mobilitas tinggi, pick-off',
+                weaknesses: 'Squishy, rentan CC, bergantung pada kombo',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Gunakan CC keras, burst dia.'
+            },
+            {
+                name: 'Nana', role: 'Mage', lane: 'Mid Lane', photoUrl: 'https://placehold.co/150x150/FFC300/111827?text=Nana',
+                strengths: 'Poke, CC (Molina), support',
+                weaknesses: 'Squishy, damage rendah, rentan dive',
+                counterHeroes: ['Gusion', 'Lancelot', 'Saber', 'Natalia'],
+                counterItems: ['Magic Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Flicker', 'Execute'],
+                tactics: 'Dive dia, hindari Molina-nya.'
+            },
+            {
+                name: 'Martis', role: 'Fighter', lane: 'Jungle', photoUrl: 'https://placehold.co/150x150/FF5733/111827?text=Martis',
+                strengths: 'Burst damage, CC, invincibility frames',
+                weaknesses: 'Rentan CC keras, bisa di-kiting',
+                counterHeroes: ['Chou', 'Khufra', 'Ruby', 'Franco'],
+                counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
+                counterSpells: ['Purify', 'Flicker'],
+                tactics: 'Gunakan CC keras, burst dia.'
+            },
+            {
+                name: 'Balmond', role: 'Fighter', lane: 'Jungle/Exp Lane', photoUrl: 'https://placehold.co/150x150/33FF57/111827?text=Balmond',
+                strengths: 'Sustain, AOE damage, clear cepat',
+                weaknesses: 'Rentan anti-heal, bisa di-kiting',
+                counterHeroes: ['Baxia', 'Karrie', 'Dyrroth'],
+                counterItems: ['Anti-Heal', 'True Damage Items'],
+                counterSpells: ['Execute', 'Flicker'],
+                tactics: 'Terapkan anti-heal, kiting dia.'
             }
         ];
 
-        function App() {
+        // Data untuk Gameplay Sesuai Patchnote Terbaru
+        const gameplayTips = [
+            {
+                title: 'Adaptasi Jalur Farming',
+                description: 'Gold Laner harus beradaptasi dengan perolehan gold yang lebih lambat dari Scavenger Crab dan mungkin perlu lebih banyak dukungan awal dari Support/Jungler.'
+            },
+            {
+                title: 'Prioritas Objektif Tim',
+                description: 'Lord menjadi objektif tim yang lebih vital. Latih koordinasi tim untuk mengamankannya dengan cepat dan efisien.'
+            },
+            {
+                title: 'Pahami Resilience',
+                description: 'Pelajari hero mana yang efek Airborne-nya kini dapat dikurangi oleh Resilience dan hero mana yang tidak (misalnya Saber dan Kalea). Sesuaikan pilihan hero dan itemisasi defensif Anda.'
+            },
+            {
+                title: 'Diversifikasi Pilihan Jungler',
+                description: 'Dengan buff pada Blessed Jungling Boots untuk non-Marksman, pertimbangkan untuk mencoba Fighter atau Assassin sebagai jungler untuk memanfaatkan perubahan ini.'
+            },
+            {
+                title: 'Perhatikan Itemisasi Tank',
+                description: 'Perubahan pada item-item Tank seperti Ares Belt dan Twilight Armor akan memengaruhi build path dan power spike Tank. Pahami item-item ini untuk mengoptimalkan durabilitas.'
+            },
+            {
+                title: 'Pilih Hero Sesuai Meta',
+                description: 'Prioritaskan hero-hero di tier SS dan S, tetapi juga pahami nerf spesifik yang mereka terima. Jangan ragu untuk mencoba hero-hero yang baru di-buff yang mungkin menjadi "pilihan tersembunyi."'
+            },
+            {
+                title: 'Fokus pada Sinergi Tim',
+                description: 'Dalam fase draft, pertimbangkan kombo hero yang kuat untuk memaksimalkan potensi tim Anda.'
+            },
+            {
+                title: 'Kuasai Penanggulangan',
+                description: 'Pahami kelemahan hero-hero meta dan bagaimana menanggulanginya dengan pemilihan hero, item, battle spell, dan strategi posisi yang tepat.'
+            }
+        ];
+
+        // Data untuk Combo-Combo Hero Efektif
+        const comboTips = [
+            {
+                heroes: ['Atlas', 'Guinevere'],
+                description: 'Atlas (Tank, CC/Inisiator) menggunakan Fatal Links untuk mengumpulkan musuh, menyiapkan Spatial Migration dan Anti-gravity Blast Guinevere (Fighter, Burst/CC) untuk kerusakan AOE besar. Kombo ini sangat efektif saat musuh berkumpul rapat.'
+            },
+            {
+                heroes: ['Tigreal', 'Pharsa'],
+                description: 'Tigreal (Tank, CC) memaksa musuh masuk ke jangkauan Pharsa (Mage, Burst/Poke), memungkinkannya melepaskan kerusakan AOE berkelanjutan dengan Feathered Airstrike. Ideal untuk pertarungan tim dengan banyak hero.'
+            },
+            {
+                heroes: ['Kaja', 'Karrie'],
+                description: 'Kaja (Support/Fighter, Inisiator/CC) dapat mengunci satu target dengan Divine Judgment, menariknya ke tim agar Karrie (Marksman, DPS) dapat menghabisi dengan kecepatan serangan tinggi dan true damage-nya.'
+            },
+            {
+                heroes: ['Johnson', 'Badang'],
+                description: 'Johnson (Tank/Support, Mobilitas/CC) mengangkut Badang (Fighter, AOE/Burst) ke garis belakang musuh, menggabungkan stun tabrakan Johnson dengan ultimate Badang untuk kerusakan AOE yang menghancurkan dan stun dinding.'
+            },
+            {
+                heroes: ['Mathilda', 'Odette'],
+                description: 'Mathilda (Support/Assassin, Mobilitas/Poke) memberikan mobilitas dan kemampuan melarikan diri untuk Odette (Mage, Burst/AOE), memungkinkan Odette untuk memposisikan diri dengan aman untuk ultimate-nya atau untuk dengan cepat mundur.'
+            },
+            {
+                heroes: ['Aldous', 'Angela'],
+                description: 'Aldous (Fighter, Burst/Chase) mendapatkan kerusakan besar dari menumpuk Skill 1-nya. Angela (Support, Buff/CC) menempel padanya dengan Heartguard, meningkatkan statistik dan memberikan CC tambahan, mengubahnya menjadi ancaman solo-carry yang tangguh.'
+            }
+        ];
+
+
+        function HeroDetailModal({ hero, onClose }) {
+            const colors = {
+                primary: '#FF5733',
+                secondary: '#FFC300',
+                accent: '#33FF57',
+                background: '#111827',
+                cardBg: '#1F2937',
+                text: '#E5E7EB',
+                subtext: '#9CA3AF',
+                border: '#4B5563'
+            };
+
+            if (!hero) return null;
+
+            return (
+                <div className="modal-overlay">
+                    <div className="modal-content w-full md:w-3/4 lg:w-2/3 xl:w-1/2" style={{ backgroundColor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+                        <button onClick={onClose} className="close-button">&times;</button>
+                        <h2 className="text-3xl font-bold mb-4 text-center" style={{ color: colors.secondary }}>
+                            {hero.name}
+                        </h2>
+                        <div className="flex flex-col md:flex-row items-center md:items-start gap-6 mb-6">
+                            <img src={hero.photoUrl} alt={hero.name} className="w-32 h-32 rounded-full object-cover border-2" style={{ borderColor: colors.primary }} />
+                            <div className="text-left flex-1">
+                                <p className="text-lg mb-2"><strong style={{ color: colors.accent }}>Role:</strong> {hero.role}</p>
+                                <p className="text-lg mb-2"><strong style={{ color: colors.accent }}>Lane:</strong> {hero.lane}</p>
+                                <p className="text-lg mb-2"><strong style={{ color: colors.accent }}>Kekuatan:</strong> {hero.strengths}</p>
+                                <p className="text-lg"><strong style={{ color: colors.accent }}>Kelemahan:</strong> {hero.weaknesses}</p>
+                            </div>
+                        </div>
+
+                        <h3 className="text-2xl font-bold mb-3" style={{ color: colors.accent }}>Detail Skill:</h3>
+                        {hero.skills && hero.skills.length > 0 ? (
+                            <div className="space-y-4 mb-6">
+                                {hero.skills.map((skill, index) => (
+                                    <div key={index} className="card p-4">
+                                        <h4 className="text-xl font-semibold mb-1" style={{ color: colors.secondary }}>{skill.name}</h4>
+                                        <p className="text-gray-300">{skill.description}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-gray-300 mb-6">Detail skill tidak tersedia untuk hero ini.</p>
+                        )}
+                        
+                        <h3 className="text-2xl font-bold mb-3" style={{ color: colors.accent }}>Strategi Counter:</h3>
+                        <div className="space-y-4">
+                            <div className="card p-4">
+                                <h4 className="text-xl font-semibold mb-1" style={{ color: colors.secondary }}>Counter Hero:</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {hero.counterHeroes && hero.counterHeroes.length > 0 ? hero.counterHeroes.map((cHero, idx) => (
+                                        <span key={idx} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>{cHero}</span>
+                                    )) : <span className="text-gray-400">Tidak tersedia</span>}
+                                </div>
+                            </div>
+                            <div className="card p-4">
+                                <h4 className="text-xl font-semibold mb-1" style={{ color: colors.secondary }}>Counter Item:</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {hero.counterItems && hero.counterItems.length > 0 ? hero.counterItems.map((cItem, idx) => (
+                                        <span key={idx} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>{cItem}</span>
+                                    )) : <span className="text-gray-400">Tidak tersedia</span>}
+                                </div>
+                            </div>
+                            <div className="card p-4">
+                                <h4 className="text-xl font-semibold mb-1" style={{ color: colors.secondary }}>Counter Spell:</h4>
+                                <div className="flex flex-wrap gap-2">
+                                    {hero.counterSpells && hero.counterSpells.length > 0 ? hero.counterSpells.map((cSpell, idx) => (
+                                        <span key={idx} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>{cSpell}</span>
+                                    )) : <span className="text-gray-400">Tidak tersedia</span>}
+                                </div>
+                            </div>
+                            <div className="card p-4">
+                                <h4 className="text-xl font-semibold mb-1" style={{ color: colors.secondary }}>Taktik Counter:</h4>
+                                <p className="text-gray-300">{hero.tactics || 'Tidak tersedia'}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function CounterHeroPage({ heroData }) {
             const [searchTerm, setSearchTerm] = React.useState('');
             const [filteredHero, setFilteredHero] = React.useState(null);
 
             const colors = {
-                primary: '#FF5733', // Energetic & Playful - Orange
-                secondary: '#FFC300', // Energetic & Playful - Yellow
-                accent: '#33FF57', // Energetic & Playful - Green
-                background: '#111827', // Dark background
-                cardBg: '#1F2937', // Slightly lighter dark for cards
-                text: '#E5E7EB', // Light text
-                subtext: '#9CA3AF', // Grayish text
-                border: '#4B5563' // Border color
+                primary: '#FF5733',
+                secondary: '#FFC300',
+                accent: '#33FF57',
+                cardBg: '#1F2937',
+                text: '#E5E7EB',
+                subtext: '#9CA3AF',
+                border: '#4B5563'
             };
 
             React.useEffect(() => {
                 if (searchTerm.length > 0) {
-                    const foundHero = heroCounterData.find(hero =>
+                    const foundHero = heroData.find(hero =>
                         hero.name.toLowerCase().includes(searchTerm.toLowerCase())
                     );
                     setFilteredHero(foundHero);
@@ -145,29 +1563,26 @@
             }, [searchTerm]);
 
             return (
-                <div className="min-h-screen p-4 md:p-8" style={{ backgroundColor: colors.background, color: colors.text }}>
-                    <header className="text-center mb-8">
-                        <h1 className="text-4xl md:text-5xl font-black mb-2" style={{ color: colors.primary }}>
-                            Pencari Counter Hero Mobile Legends
-                        </h1>
-                        <p className="text-lg md:text-xl" style={{ color: colors.subtext }}>
-                            Temukan strategi terbaik untuk melawan hero musuh!
-                        </p>
-                    </header>
+                <div className="p-4 md:p-8">
+                    <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
+                        Pencari Counter Hero
+                    </h1>
+                    <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
+                        Temukan strategi terbaik untuk melawan hero musuh!
+                    </p>
 
                     <div className="max-w-xl mx-auto mb-8">
                         <input
                             type="text"
                             placeholder="Cari nama hero (contoh: Floryn)"
                             className="w-full p-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            style={{ backgroundColor: colors.cardBg, color: colors.text, border: `1px solid ${colors.border}` }}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
 
                     {filteredHero ? (
-                        <div className="max-w-3xl mx-auto p-6 rounded-xl shadow-2xl" style={{ backgroundColor: colors.cardBg, border: `1px solid ${colors.border}` }}>
+                        <div className="max-w-3xl mx-auto p-6 rounded-xl shadow-2xl card">
                             <h2 className="text-3xl font-bold mb-4 text-center" style={{ color: colors.secondary }}>
                                 {filteredHero.name}
                             </h2>
@@ -175,55 +1590,57 @@
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                                 <div>
                                     <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Kekuatan:</h3>
-                                    <p className="text-gray-300">{filteredHero.strengths}</p>
+                                    <p className="text-gray-300">{filteredHero.strengths || 'Tidak tersedia'}</p>
                                 </div>
                                 <div>
                                     <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Kelemahan:</h3>
-                                    <p className="text-gray-300">{filteredHero.weaknesses}</p>
+                                    <p className="text-gray-300">{filteredHero.weaknesses || 'Tidak tersedia'}</p>
                                 </div>
                             </div>
 
                             <div className="mb-6">
                                 <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Counter Hero:</h3>
                                 <div className="flex flex-wrap gap-2">
-                                    {filteredHero.counterHeroes.map((hero, index) => (
+                                    {filteredHero.counterHeroes && filteredHero.counterHeroes.length > 0 ? filteredHero.counterHeroes.map((hero, index) => (
                                         <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>
                                             {hero}
                                         </span>
-                                    ))}
+                                    )) : <span className="text-gray-400">Tidak tersedia</span>}
                                 </div>
                             </div>
 
                             <div className="mb-6">
                                 <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Counter Item:</h3>
                                 <div className="flex flex-wrap gap-2">
-                                    {filteredHero.counterItems.map((item, index) => (
+                                    {filteredHero.counterItems && filteredHero.counterItems.length > 0 ? filteredHero.counterItems.map((item, index) => (
                                         <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>
                                             {item}
                                         </span>
-                                    ))}
+                                    )) : <span className="text-gray-400">Tidak tersedia</span>}
                                 </div>
                             </div>
 
                             <div className="mb-6">
                                 <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Counter Spell:</h3>
                                 <div className="flex flex-wrap gap-2">
-                                    {filteredHero.counterSpells.map((spell, index) => (
+                                    {filteredHero.counterSpells && filteredHero.counterSpells.length > 0 ? filteredHero.counterSpells.map((spell, index) => (
                                         <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>
                                             {spell}
                                         </span>
-                                    ))}
+                                    )) : <span className="text-gray-400">Tidak tersedia</span>}
                                 </div>
                             </div>
 
                             <div>
                                 <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Taktik:</h3>
-                                <p className="text-gray-300">{filteredHero.tactics}</p>
+                                <p className="text-gray-300">{filteredHero.tactics || 'Tidak tersedia'}</p>
                             </div>
                         </div>
                     ) : (
                         <p className="text-center text-lg mt-12" style={{ color: colors.subtext }}>
                             Ketik nama hero di atas untuk melihat informasi counternya.
+                            <br/>
+                            <span className="text-sm text-gray-500">(Data counter hero ini diinferensi dari catatan patch dan mungkin tidak mencakup semua strategi universal.)</span>
                         </p>
                     )}
 
@@ -232,6 +1649,454 @@
                             Hero "{searchTerm}" tidak ditemukan dalam data counter.
                         </p>
                     )}
+                </div>
+            );
+        }
+
+        function HeroListPage({ heroData, onHeroClick }) {
+            const colors = {
+                primary: '#FF5733',
+                secondary: '#FFC300',
+                accent: '#33FF57',
+                cardBg: '#1F2937',
+                text: '#E5E7EB',
+                subtext: '#9CA3AF',
+                border: '#4B5563'
+            };
+
+            return (
+                <div className="p-4 md:p-8">
+                    <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
+                        Daftar Hero Lengkap
+                    </h1>
+                    <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
+                        Jelajahi semua hero Mobile Legends yang ada dalam catatan patch.
+                        <br/>
+                        <span className="text-sm text-gray-500">(Foto dan detail skill bersifat placeholder/generik. Klik hero untuk detail.)</span>
+                    </p>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                        {heroData.map(hero => (
+                            <div 
+                                key={hero.name} 
+                                className="card flex flex-col items-center p-4 cursor-pointer hover:scale-105 transition-transform duration-200"
+                                onClick={() => onHeroClick(hero)}
+                            >
+                                <img src={hero.photoUrl} alt={hero.name} className="w-24 h-24 rounded-full object-cover mb-2 border-2" style={{ borderColor: colors.secondary }} />
+                                <h3 className="text-lg font-semibold text-center" style={{ color: colors.text }}>{hero.name}</h3>
+                                <p className="text-sm text-gray-400 text-center">{hero.role}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function DraftPickSimulationPage({ heroData }) {
+            const [teamA, setTeamA] = React.useState(Array(5).fill(null));
+            const [teamB, setTeamB] = React.useState(Array(5).fill(null));
+            const [currentPickingTeam, setCurrentPickingTeam] = React.useState('A'); // 'A' or 'B'
+            const [currentPickSlot, setCurrentPickSlot] = React.useState(0); // 0 to 4
+            const [showHeroPicker, setShowHeroPicker] = React.useState(false);
+            const [pickerTargetSlot, setPickerTargetSlot] = React.useState({ team: '', slot: -1 });
+            const [pickerSearchTerm, setPickerSearchTerm] = React.useState('');
+            const [suggestedCounters, setSuggestedCounters] = React.useState([]);
+
+            const colors = {
+                primary: '#FF5733',
+                secondary: '#FFC300',
+                accent: '#33FF57',
+                cardBg: '#1F2937',
+                text: '#E5E7EB',
+                subtext: '#9CA3AF',
+                border: '#4B5563',
+                teamAColor: '#337BFF', // Blue
+                teamBColor: '#C70039'  // Red
+            };
+
+            const allPickedHeroes = [...teamA, ...teamB].filter(Boolean);
+            const availableHeroes = heroData.filter(hero => !allPickedHeroes.some(picked => picked.name === hero.name));
+
+            const handlePickClick = (team, slotIndex) => {
+                setPickerTargetSlot({ team, slot: slotIndex });
+                setShowHeroPicker(true);
+            };
+
+            const handleHeroSelect = (hero) => {
+                const { team, slot } = pickerTargetSlot;
+                if (team === 'A') {
+                    const newTeamA = [...teamA];
+                    newTeamA[slot] = hero;
+                    setTeamA(newTeamA);
+                } else {
+                    const newTeamB = [...teamB];
+                    newTeamB[slot] = hero;
+                    setTeamB(newTeamB);
+                }
+                setShowHeroPicker(false);
+                setPickerSearchTerm('');
+                // Update counters based on the hero just picked by the *other* team
+                const pickedHeroForCounter = (team === 'A' ? teamB : teamA)[slot];
+                if (pickedHeroForCounter && pickedHeroForCounter.counterHeroes && pickedHeroForCounter.counterHeroes.length > 0) {
+                    const counters = pickedHeroForCounter.counterHeroes.map(counterName =>
+                        heroData.find(h => h.name === counterName)
+                    ).filter(Boolean);
+                    setSuggestedCounters(counters);
+                } else {
+                    setSuggestedCounters([]);
+                }
+                advancePickTurn();
+            };
+
+            const updateCounters = () => {
+                // This function is called after a pick. We need to suggest counters for the *last picked hero* by the *enemy team*.
+                // Determine which team just picked
+                const lastPickedTeamHeroes = currentPickingTeam === 'A' ? teamB : teamA;
+                const lastPickedHero = lastPickedTeamHeroes[currentPickSlot]; // This slot is for the team that *just* picked
+
+                if (lastPickedHero && lastPickedHero.counterHeroes && lastPickedHero.counterHeroes.length > 0) {
+                    const counters = lastPickedHero.counterHeroes.map(counterName =>
+                        heroData.find(h => h.name === counterName)
+                    ).filter(Boolean); // Filter out nulls if counter hero not found in data
+                    setSuggestedCounters(counters);
+                } else {
+                    setSuggestedCounters([]);
+                }
+            };
+
+            const advancePickTurn = () => {
+                // Simple sequential pick: A1, B1, A2, B2, etc.
+                const nextPickSlot = currentPickingTeam === 'B' ? currentPickSlot + 1 : currentPickSlot;
+                const nextPickingTeam = currentPickingTeam === 'A' ? 'B' : 'A';
+
+                setCurrentPickingTeam(nextPickingTeam);
+                setCurrentPickSlot(nextPickSlot);
+
+                // If all slots are filled, stop advancing
+                if (nextPickSlot >= 5) {
+                    setCurrentPickingTeam(''); // End pick phase
+                }
+            };
+
+            const resetSimulation = () => {
+                setTeamA(Array(5).fill(null));
+                setTeamB(Array(5).fill(null));
+                setCurrentPickingTeam('A');
+                setCurrentPickSlot(0);
+                setSuggestedCounters([]);
+                setShowHeroPicker(false);
+                setPickerSearchTerm('');
+            };
+
+            const filteredPickerHeroes = availableHeroes.filter(hero =>
+                hero.name.toLowerCase().includes(pickerSearchTerm.toLowerCase())
+            );
+
+            // Effect to update counters when a hero is picked (teamA or teamB changes)
+            React.useEffect(() => {
+                // This effect will run after handleHeroSelect updates teamA/teamB
+                // It will then trigger updateCounters for the *next* turn's suggestions
+                // No need to call updateCounters here directly, it's handled in handleHeroSelect
+            }, [teamA, teamB]);
+
+
+            return (
+                <div className="p-4 md:p-8">
+                    <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
+                        Simulasi Draft Pick
+                    </h1>
+                    <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
+                        Simulasikan fase draft Mobile Legends dan dapatkan saran counter hero.
+                    </p>
+
+                    <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Team A */}
+                        <div className="lg:col-span-1 card p-6">
+                            <h2 className="text-2xl font-bold mb-4 text-center" style={{ color: colors.teamAColor }}>Tim Anda (Biru)</h2>
+                            <div className="grid grid-cols-3 gap-4">
+                                {teamA.map((hero, index) => (
+                                    <div 
+                                        key={index} 
+                                        className={`team-slot ${hero ? 'picked' : ''}`} 
+                                        style={{ borderColor: hero ? colors.teamAColor : colors.border }}
+                                    >
+                                        {hero ? (
+                                            <>
+                                                <img src={hero.photoUrl} alt={hero.name} style={{ borderColor: colors.teamAColor }} />
+                                                <span className="text-sm font-semibold mt-1">{hero.name}</span>
+                                            </>
+                                        ) : (
+                                            <span className="text-gray-500">Slot {index + 1}</span>
+                                        )}
+                                        {currentPickSlot === index && currentPickingTeam === 'A' && !hero && (
+                                            <button onClick={() => handlePickClick('A', index)} className="pick-button">Pilih</button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Middle Section: Current Pick & Suggestions */}
+                        <div className="lg:col-span-1 flex flex-col items-center justify-center p-6">
+                            <div className="card p-4 mb-6 w-full">
+                                <h3 className="text-xl font-bold mb-2 text-center" style={{ color: colors.secondary }}>Giliran Pick:</h3>
+                                <p className="text-3xl font-black text-center" style={{ color: currentPickingTeam === 'A' ? colors.teamAColor : colors.teamBColor }}>
+                                    {currentPickingTeam ? `Tim ${currentPickingTeam} - Slot ${currentPickSlot + 1}` : 'Draft Selesai!'}
+                                </p>
+                            </div>
+
+                            {suggestedCounters.length > 0 && (
+                                <div className="card p-4 w-full mb-6">
+                                    <h3 className="text-xl font-bold mb-2 text-center" style={{ color: colors.accent }}>Saran Counter:</h3>
+                                    <p className="text-sm text-gray-400 text-center mb-2">Melawan {currentPickingTeam === 'A' ? (teamB[currentPickSlot] ? teamB[currentPickSlot].name : 'Hero Musuh') : (teamA[currentPickSlot] ? teamA[currentPickSlot].name : 'Hero Musuh')}</p>
+                                    <div className="flex flex-wrap justify-center gap-2">
+                                        {suggestedCounters.map(hero => (
+                                            <div key={hero.name} className="flex flex-col items-center text-sm">
+                                                <img src={hero.photoUrl} alt={hero.name} className="w-12 h-12 rounded-full object-cover border-2" style={{ borderColor: colors.accent }} />
+                                                <span className="text-xs mt-1">{hero.name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                            
+                            <button onClick={resetSimulation} className="reset-button">Reset Simulasi</button>
+                        </div>
+
+                        {/* Team B */}
+                        <div className="lg:col-span-1 card p-6">
+                            <h2 className="text-2xl font-bold mb-4 text-center" style={{ color: colors.teamBColor }}>Tim Musuh (Merah)</h2>
+                            <div className="grid grid-cols-3 gap-4">
+                                {teamB.map((hero, index) => (
+                                    <div 
+                                        key={index} 
+                                        className={`team-slot ${hero ? 'picked' : ''}`} 
+                                        style={{ borderColor: hero ? colors.teamBColor : colors.border }}
+                                    >
+                                        {hero ? (
+                                            <>
+                                                <img src={hero.photoUrl} alt={hero.name} style={{ borderColor: colors.teamBColor }} />
+                                                <span className="text-sm font-semibold mt-1">{hero.name}</span>
+                                            </>
+                                        ) : (
+                                            <span className="text-gray-500">Slot {index + 1}</span>
+                                        )}
+                                        {currentPickSlot === index && currentPickingTeam === 'B' && !hero && (
+                                            <button onClick={() => handlePickClick('B', index)} className="pick-button">Pilih</button>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {showHeroPicker && (
+                        <div className="modal-overlay">
+                            <div className="modal-content">
+                                <button onClick={() => setShowHeroPicker(false)} className="close-button">&times;</button>
+                                <h3 className="text-2xl font-bold mb-4 text-center" style={{ color: colors.secondary }}>Pilih Hero</h3>
+                                <input
+                                    type="text"
+                                    placeholder="Cari hero..."
+                                    className="w-full p-2 rounded-lg mb-4"
+                                    value={pickerSearchTerm}
+                                    onChange={(e) => setPickerSearchTerm(e.target.value)}
+                                />
+                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 max-h-80 overflow-y-auto">
+                                    {filteredPickerHeroes.map(hero => (
+                                        <div 
+                                            key={hero.name} 
+                                            className="flex flex-col items-center p-2 card cursor-pointer hover:scale-105 transition-transform duration-200"
+                                            onClick={() => handleHeroSelect(hero)}
+                                        >
+                                            <img src={hero.photoUrl} alt={hero.name} className="w-16 h-16 rounded-full object-cover mb-1 border-2" style={{ borderColor: colors.accent }} />
+                                            <span className="text-xs font-semibold text-center">{hero.name}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                {filteredPickerHeroes.length === 0 && pickerSearchTerm.length > 0 && (
+                                    <p className="text-center text-gray-400 mt-4">Hero "{pickerSearchTerm}" tidak ditemukan atau sudah dipilih.</p>
+                                )}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            );
+        }
+
+        function GameplayTipsPage({ gameplayTips }) {
+            const colors = {
+                primary: '#FF5733',
+                secondary: '#FFC300',
+                accent: '#33FF57',
+                cardBg: '#1F2937',
+                text: '#E5E7EB',
+                subtext: '#9CA3AF',
+                border: '#4B5563'
+            };
+
+            return (
+                <div className="p-4 md:p-8">
+                    <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
+                        Gameplay Sesuai Patchnote Terbaru
+                    </h1>
+                    <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
+                        Rekomendasi strategis untuk beradaptasi dengan meta patch 1.9.91.
+                    </p>
+
+                    <div className="max-w-4xl mx-auto space-y-6">
+                        {gameplayTips.map((tip, index) => (
+                            <div key={index} className="card p-6 text-left">
+                                <h3 className="text-2xl font-semibold mb-2" style={{ color: colors.secondary }}>{tip.title}</h3>
+                                <p className="text-gray-300">{tip.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function ComboTipsPage({ comboTips }) {
+            const colors = {
+                primary: '#FF5733',
+                secondary: '#FFC300',
+                accent: '#33FF57',
+                cardBg: '#1F2937',
+                text: '#E5E7EB',
+                subtext: '#9CA3AF',
+                border: '#4B5563'
+            };
+
+            return (
+                <div className="p-4 md:p-8">
+                    <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
+                        Combo-Combo Hero Efektif
+                    </h1>
+                    <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
+                        Sinergi hero yang kuat untuk mendominasi pertandingan.
+                    </p>
+
+                    <div className="max-w-4xl mx-auto space-y-6">
+                        {comboTips.map((combo, index) => (
+                            <div key={index} className="card p-6 text-left">
+                                <h3 className="text-2xl font-semibold mb-2" style={{ color: colors.secondary }}>
+                                    {combo.heroes.join(' + ')}
+                                </h3>
+                                <p className="text-gray-300">{combo.description}</p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            );
+        }
+
+        function TipsPage({ gameplayTips, comboTips }) {
+            const [currentSubPage, setCurrentSubPage] = React.useState('gameplay'); // 'gameplay' or 'combo'
+
+            const colors = {
+                primary: '#FF5733',
+                cardBg: '#1F2937',
+                text: '#E5E7EB',
+                border: '#4B5563'
+            };
+
+            return (
+                <div className="min-h-screen">
+                    <nav className="p-4 flex flex-wrap justify-center gap-4 border-b" style={{ borderColor: colors.border, backgroundColor: colors.cardBg }}>
+                        <button
+                            onClick={() => setCurrentSubPage('gameplay')}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+                                currentSubPage === 'gameplay' ? 'text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                            style={{ backgroundColor: currentSubPage === 'gameplay' ? colors.primary : 'transparent' }}
+                        >
+                            Gameplay Sesuai Patchnote
+                        </button>
+                        <button
+                            onClick={() => setCurrentSubPage('combo')}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+                                currentSubPage === 'combo' ? 'text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                            style={{ backgroundColor: currentSubPage === 'combo' ? colors.primary : 'transparent' }}
+                        >
+                            Combo-Combo Hero Efektif
+                        </button>
+                    </nav>
+
+                    {currentSubPage === 'gameplay' && <GameplayTipsPage gameplayTips={gameplayTips} />}
+                    {currentSubPage === 'combo' && <ComboTipsPage comboTips={comboTips} />}
+                </div>
+            );
+        }
+
+
+        function App() {
+            const [currentPage, setCurrentPage] = React.useState('counter'); // 'counter', 'list', 'draft', or 'tips'
+            const [selectedHero, setSelectedHero] = React.useState(null);
+
+            const colors = {
+                primary: '#FF5733',
+                background: '#111827',
+                cardBg: '#1F2937',
+                text: '#E5E7EB',
+                border: '#4B5563'
+            };
+
+            const handleHeroClick = (hero) => {
+                setSelectedHero(hero);
+            };
+
+            const handleCloseModal = () => {
+                setSelectedHero(null);
+            };
+
+            return (
+                <div className="min-h-screen" style={{ backgroundColor: colors.background, color: colors.text }}>
+                    <nav className="p-4 flex flex-wrap justify-center gap-4 border-b" style={{ borderColor: colors.border, backgroundColor: colors.cardBg }}>
+                        <button
+                            onClick={() => setCurrentPage('counter')}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+                                currentPage === 'counter' ? 'text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                            style={{ backgroundColor: currentPage === 'counter' ? colors.primary : 'transparent' }}
+                        >
+                            Pencari Counter Hero
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage('list')}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+                                currentPage === 'list' ? 'text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                            style={{ backgroundColor: currentPage === 'list' ? colors.primary : 'transparent' }}
+                        >
+                            Daftar Hero Lengkap
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage('draft')}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+                                currentPage === 'draft' ? 'text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                            style={{ backgroundColor: currentPage === 'draft' ? colors.primary : 'transparent' }}
+                        >
+                            Simulasi Draft Pick
+                        </button>
+                        <button
+                            onClick={() => setCurrentPage('tips')}
+                            className={`px-4 py-2 rounded-lg font-semibold transition-colors duration-200 ${
+                                currentPage === 'tips' ? 'text-white' : 'text-gray-400 hover:text-white'
+                            }`}
+                            style={{ backgroundColor: currentPage === 'tips' ? colors.primary : 'transparent' }}
+                        >
+                            Tips Tips
+                        </button>
+                    </nav>
+
+                    {currentPage === 'counter' && <CounterHeroPage heroData={heroData} />}
+                    {currentPage === 'list' && <HeroListPage heroData={heroData} onHeroClick={handleHeroClick} />}
+                    {currentPage === 'draft' && <DraftPickSimulationPage heroData={heroData} />}
+                    {currentPage === 'tips' && <TipsPage gameplayTips={gameplayTips} comboTips={comboTips} />}
+
+                    {selectedHero && <HeroDetailModal hero={selectedHero} onClose={handleCloseModal} />}
                 </div>
             );
         }
