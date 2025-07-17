@@ -1474,7 +1474,7 @@
         const comboTips = [
             {
                 heroes: ['Atlas', 'Guinevere'],
-                description: 'Atlas (Tank, CC/Inisiator) menggunakan Fatal Links untuk mengumpulkan musuh, menyiapkan Spatial Migration dan Anti-gravity Blast Guinevere (Fighter, Burst/CC) untuk kerusakan AOE besar. Kombo ini sangat efektif saat musuh berkumpul rapat.'
+                description: 'Atlas (Tank, CC/Inisiasi) menggunakan Fatal Links untuk mengumpulkan musuh, menyiapkan Spatial Migration dan Anti-gravity Blast Guinevere (Fighter, Burst/CC) untuk kerusakan AOE besar. Kombo ini sangat efektif saat musuh berkumpul rapat.'
             },
             {
                 heroes: ['Tigreal', 'Pharsa'],
@@ -1607,91 +1607,93 @@
 
             return (
                 <div className="p-4 md:p-8">
-                    <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
-                        Pencari Counter Hero
-                    </h1>
-                    <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
-                        Temukan strategi terbaik untuk melawan hero musuh!
-                    </p>
+                    <div className="max-w-6xl mx-auto p-6 rounded-xl shadow-2xl card"> {/* Added card styling here */}
+                        <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
+                            Pencari Counter Hero
+                        </h1>
+                        <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
+                            Temukan strategi terbaik untuk melawan hero musuh!
+                        </p>
 
-                    <div className="max-w-xl mx-auto mb-8">
-                        <input
-                            type="text"
-                            placeholder="Cari nama hero (contoh: Floryn)"
-                            className="w-full p-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                        />
-                    </div>
-
-                    {filteredHero ? (
-                        <div className="max-w-3xl mx-auto p-6 rounded-xl shadow-2xl card">
-                            <h2 className="text-3xl font-bold mb-4 text-center" style={{ color: colors.secondary }}>
-                                {filteredHero.name}
-                            </h2>
-                            
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                                <div>
-                                    <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Kekuatan:</h3>
-                                    <p className="text-gray-300">{filteredHero.strengths || 'Tidak tersedia'}</p>
-                                </div>
-                                <div>
-                                    <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Kelemahan:</h3>
-                                    <p className="text-gray-300">{filteredHero.weaknesses || 'Tidak tersedia'}</p>
-                                </div>
-                            </div>
-
-                            <div className="mb-6">
-                                <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Counter Hero:</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {filteredHero.counterHeroes && filteredHero.counterHeroes.length > 0 ? filteredHero.counterHeroes.map((hero, index) => (
-                                        <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>
-                                            {hero}
-                                        </span>
-                                    )) : <span className="text-gray-400">Tidak tersedia</span>}
-                                </div>
-                            </div>
-
-                            <div className="mb-6">
-                                <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Counter Item:</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {filteredHero.counterItems && filteredHero.counterItems.length > 0 ? filteredHero.counterItems.map((item, index) => (
-                                        <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>
-                                            {item}
-                                        </span>
-                                    )) : <span className="text-gray-400">Tidak tersedia</span>}
-                                </div>
-                            </div>
-
-                            <div className="mb-6">
-                                <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Counter Spell:</h3>
-                                <div className="flex flex-wrap gap-2">
-                                    {filteredHero.counterSpells && filteredHero.counterSpells.length > 0 ? filteredHero.counterSpells.map((spell, index) => (
-                                        <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>
-                                            {spell}
-                                        </span>
-                                    )) : <span className="text-gray-400">Tidak tersedia</span>}
-                                </div>
-                            </div>
-
-                            <div>
-                                <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Taktik:</h3>
-                                <p className="text-gray-300">{filteredHero.tactics || 'Tidak tersedia'}</p>
-                            </div>
+                        <div className="max-w-xl mx-auto mb-8">
+                            <input
+                                type="text"
+                                placeholder="Cari nama hero (contoh: Floryn)"
+                                className="w-full p-3 rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                            />
                         </div>
-                    ) : (
-                        <p className="text-center text-lg mt-12" style={{ color: colors.subtext }}>
-                            Ketik nama hero di atas untuk melihat informasi counternya.
-                            <br/>
-                            <span className="text-sm text-gray-500">(Data counter hero ini diinferensi dari catatan patch dan mungkin tidak mencakup semua strategi universal.)</span>
-                        </p>
-                    )}
 
-                    {!filteredHero && searchTerm.length > 0 && (
-                        <p className="text-center text-lg mt-4 text-red-400">
-                            Hero "{searchTerm}" tidak ditemukan dalam data counter.
-                        </p>
-                    )}
+                        {filteredHero ? (
+                            <div className="p-6 rounded-xl"> {/* Removed card here, already on parent */}
+                                <h2 className="text-3xl font-bold mb-4 text-center" style={{ color: colors.secondary }}>
+                                    {filteredHero.name}
+                                </h2>
+                                
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                                    <div>
+                                        <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Kekuatan:</h3>
+                                        <p className="text-gray-300">{filteredHero.strengths || 'Tidak tersedia'}</p>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Kelemahan:</h3>
+                                        <p className="text-gray-300">{filteredHero.weaknesses || 'Tidak tersedia'}</p>
+                                    </div>
+                                </div>
+
+                                <div className="mb-6">
+                                    <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Counter Hero:</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {filteredHero.counterHeroes && filteredHero.counterHeroes.length > 0 ? filteredHero.counterHeroes.map((hero, index) => (
+                                            <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>
+                                                {hero}
+                                            </span>
+                                        )) : <span className="text-gray-400">Tidak tersedia</span>}
+                                    </div>
+                                </div>
+
+                                <div className="mb-6">
+                                    <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Counter Item:</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {filteredHero.counterItems && filteredHero.counterItems.length > 0 ? filteredHero.counterItems.map((item, index) => (
+                                            <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>
+                                                {item}
+                                            </span>
+                                        )) : <span className="text-gray-400">Tidak tersedia</span>}
+                                    </div>
+                                </div>
+
+                                <div className="mb-6">
+                                    <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Counter Spell:</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {filteredHero.counterSpells && filteredHero.counterSpells.length > 0 ? filteredHero.counterSpells.map((spell, index) => (
+                                            <span key={index} className="px-3 py-1 rounded-full text-sm font-medium" style={{ backgroundColor: colors.border, color: colors.text }}>
+                                                {spell}
+                                            </span>
+                                        )) : <span className="text-gray-400">Tidak tersedia</span>}
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <h3 className="text-xl font-semibold mb-2" style={{ color: colors.accent }}>Taktik:</h3>
+                                    <p className="text-gray-300">{filteredHero.tactics || 'Tidak tersedia'}</p>
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-center text-lg mt-12" style={{ color: colors.subtext }}>
+                                Ketik nama hero di atas untuk melihat informasi counternya.
+                                <br/>
+                                <span className="text-sm text-gray-500">(Data counter hero ini diinferensi dari catatan patch dan mungkin tidak mencakup semua strategi universal.)</span>
+                            </p>
+                        )}
+
+                        {!filteredHero && searchTerm.length > 0 && (
+                            <p className="text-center text-lg mt-4 text-red-400">
+                                Hero "{searchTerm}" tidak ditemukan dalam data counter.
+                            </p>
+                        )}
+                    </div>
                 </div>
             );
         }
@@ -1709,27 +1711,29 @@
 
             return (
                 <div className="p-4 md:p-8">
-                    <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
-                        Daftar Hero Lengkap
-                    </h1>
-                    <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
-                        Jelajahi semua hero Mobile Legends yang ada dalam catatan patch.
-                        <br/>
-                        <span className="text-sm text-gray-500">(Foto dan detail skill bersifat placeholder/generik. Klik hero untuk detail.)</span>
-                    </p>
+                    <div className="max-w-6xl mx-auto p-6 rounded-xl shadow-2xl card"> {/* Added card styling here */}
+                        <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
+                            Daftar Hero Lengkap
+                        </h1>
+                        <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
+                            Jelajahi semua hero Mobile Legends yang ada dalam catatan patch.
+                            <br/>
+                            <span className="text-sm text-gray-500">(Foto dan detail skill bersifat placeholder/generik. Klik hero untuk detail.)</span>
+                        </p>
 
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
-                        {heroData.map(hero => (
-                            <div 
-                                key={hero.name} 
-                                className="card flex flex-col items-center p-4 cursor-pointer hover:scale-105 transition-transform duration-200"
-                                onClick={() => onHeroClick(hero)}
-                            >
-                                <img src={hero.photoUrl} alt={hero.name} className="w-24 h-24 rounded-full object-cover mb-2 border-2" style={{ borderColor: colors.secondary }} />
-                                <h3 className="text-lg font-semibold text-center" style={{ color: colors.text }}>{hero.name}</h3>
-                                <p className="text-sm text-gray-400 text-center">{hero.role}</p>
-                            </div>
-                        ))}
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4">
+                            {heroData.map(hero => (
+                                <div 
+                                    key={hero.name} 
+                                    className="card flex flex-col items-center p-4 cursor-pointer hover:scale-105 transition-transform duration-200"
+                                    onClick={() => onHeroClick(hero)}
+                                >
+                                    <img src={hero.photoUrl} alt={hero.name} className="w-24 h-24 rounded-full object-cover mb-2 border-2" style={{ borderColor: colors.secondary }} />
+                                    <h3 className="text-lg font-semibold text-center" style={{ color: colors.text }}>{hero.name}</h3>
+                                    <p className="text-sm text-gray-400 text-center">{hero.role}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             );
@@ -1845,124 +1849,126 @@
 
             return (
                 <div className="p-4 md:p-8">
-                    <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
-                        Simulasi Draft Pick
-                    </h1>
-                    <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
-                        Simulasikan fase draft Mobile Legends dan dapatkan saran counter hero.
-                    </p>
+                    <div className="max-w-6xl mx-auto p-6 rounded-xl shadow-2xl card"> {/* Added card styling here */}
+                        <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
+                            Simulasi Draft Pick
+                        </h1>
+                        <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
+                            Simulasikan fase draft Mobile Legends dan dapatkan saran counter hero.
+                        </p>
 
-                    <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        {/* Team A */}
-                        <div className="lg:col-span-1 card p-6">
-                            <h2 className="text-2xl font-bold mb-4 text-center" style={{ color: colors.teamAColor }}>Tim Anda (Biru)</h2>
-                            <div className="grid grid-cols-3 gap-4">
-                                {teamA.map((hero, index) => (
-                                    <div 
-                                        key={index} 
-                                        className={`team-slot ${hero ? 'picked' : ''}`} 
-                                        style={{ borderColor: hero ? colors.teamAColor : colors.border }}
-                                    >
-                                        {hero ? (
-                                            <>
-                                                <img src={hero.photoUrl} alt={hero.name} style={{ borderColor: colors.teamAColor }} />
-                                                <span className="text-sm font-semibold mt-1">{hero.name}</span>
-                                            </>
-                                        ) : (
-                                            <span className="text-gray-500">Slot {index + 1}</span>
-                                        )}
-                                        {currentPickSlot === index && currentPickingTeam === 'A' && !hero && (
-                                            <button onClick={() => handlePickClick('A', index)} className="pick-button">Pilih</button>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Middle Section: Current Pick & Suggestions */}
-                        <div className="lg:col-span-1 flex flex-col items-center justify-center p-6">
-                            <div className="card p-4 mb-6 w-full">
-                                <h3 className="text-xl font-bold mb-2 text-center" style={{ color: colors.secondary }}>Giliran Pick:</h3>
-                                <p className="text-3xl font-black text-center" style={{ color: currentPickingTeam === 'A' ? colors.teamAColor : colors.teamBColor }}>
-                                    {currentPickingTeam ? `Tim ${currentPickingTeam} - Slot ${currentPickSlot + 1}` : 'Draft Selesai!'}
-                                </p>
-                            </div>
-
-                            {suggestedCounters.length > 0 && (
-                                <div className="card p-4 w-full mb-6">
-                                    <h3 className="text-xl font-bold mb-2 text-center" style={{ color: colors.accent }}>Saran Counter:</h3>
-                                    <p className="text-sm text-gray-400 text-center mb-2">Melawan {currentPickingTeam === 'A' ? (teamB[currentPickSlot] ? teamB[currentPickSlot].name : 'Hero Musuh') : (teamA[currentPickSlot] ? teamA[currentPickSlot].name : 'Hero Musuh')}</p>
-                                    <div className="flex flex-wrap justify-center gap-2">
-                                        {suggestedCounters.map(hero => (
-                                            <div key={hero.name} className="flex flex-col items-center text-sm">
-                                                <img src={hero.photoUrl} alt={hero.name} className="w-12 h-12 rounded-full object-cover border-2" style={{ borderColor: colors.accent }} />
-                                                <span className="text-xs mt-1">{hero.name}</span>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-                            
-                            <button onClick={resetSimulation} className="reset-button">Reset Simulasi</button>
-                        </div>
-
-                        {/* Team B */}
-                        <div className="lg:col-span-1 card p-6">
-                            <h2 className="text-2xl font-bold mb-4 text-center" style={{ color: colors.teamBColor }}>Tim Musuh (Merah)</h2>
-                            <div className="grid grid-cols-3 gap-4">
-                                {teamB.map((hero, index) => (
-                                    <div 
-                                        key={index} 
-                                        className={`team-slot ${hero ? 'picked' : ''}`} 
-                                        style={{ borderColor: hero ? colors.teamBColor : colors.border }}
-                                    >
-                                        {hero ? (
-                                            <>
-                                                <img src={hero.photoUrl} alt={hero.name} style={{ borderColor: colors.teamBColor }} />
-                                                <span className="text-sm font-semibold mt-1">{hero.name}</span>
-                                            </>
-                                        ) : (
-                                            <span className="text-gray-500">Slot {index + 1}</span>
-                                        )}
-                                        {currentPickSlot === index && currentPickingTeam === 'B' && !hero && (
-                                            <button onClick={() => handlePickClick('B', index)} className="pick-button">Pilih</button>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {showHeroPicker && (
-                        <div className="modal-overlay">
-                            <div className="modal-content">
-                                <button onClick={() => setShowHeroPicker(false)} className="close-button">&times;</button>
-                                <h3 className="text-2xl font-bold mb-4 text-center" style={{ color: colors.secondary }}>Pilih Hero</h3>
-                                <input
-                                    type="text"
-                                    placeholder="Cari hero..."
-                                    className="w-full p-2 rounded-lg mb-4"
-                                    value={pickerSearchTerm}
-                                    onChange={(e) => setPickerSearchTerm(e.target.value)}
-                                />
-                                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 max-h-80 overflow-y-auto">
-                                    {filteredPickerHeroes.map(hero => (
+                        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            {/* Team A */}
+                            <div className="lg:col-span-1 card p-6">
+                                <h2 className="text-2xl font-bold mb-4 text-center" style={{ color: colors.teamAColor }}>Tim Anda (Biru)</h2>
+                                <div className="grid grid-cols-3 gap-4">
+                                    {teamA.map((hero, index) => (
                                         <div 
-                                            key={hero.name} 
-                                            className="flex flex-col items-center p-2 card cursor-pointer hover:scale-105 transition-transform duration-200"
-                                            onClick={() => handleHeroSelect(hero)}
+                                            key={index} 
+                                            className={`team-slot ${hero ? 'picked' : ''}`} 
+                                            style={{ borderColor: hero ? colors.teamAColor : colors.border }}
                                         >
-                                            <img src={hero.photoUrl} alt={hero.name} className="w-16 h-16 rounded-full object-cover mb-1 border-2" style={{ borderColor: colors.accent }} />
-                                            <span className="text-xs font-semibold text-center">{hero.name}</span>
+                                            {hero ? (
+                                                <>
+                                                    <img src={hero.photoUrl} alt={hero.name} style={{ borderColor: colors.teamAColor }} />
+                                                    <span className="text-sm font-semibold mt-1">{hero.name}</span>
+                                                </>
+                                            ) : (
+                                                <span className="text-gray-500">Slot {index + 1}</span>
+                                            )}
+                                            {currentPickSlot === index && currentPickingTeam === 'A' && !hero && (
+                                                <button onClick={() => handlePickClick('A', index)} className="pick-button">Pilih</button>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
-                                {filteredPickerHeroes.length === 0 && pickerSearchTerm.length > 0 && (
-                                    <p className="text-center text-gray-400 mt-4">Hero "{pickerSearchTerm}" tidak ditemukan atau sudah dipilih.</p>
+                            </div>
+
+                            {/* Middle Section: Current Pick & Suggestions */}
+                            <div className="lg:col-span-1 flex flex-col items-center justify-center p-6">
+                                <div className="card p-4 mb-6 w-full">
+                                    <h3 className="text-xl font-bold mb-2 text-center" style={{ color: colors.secondary }}>Giliran Pick:</h3>
+                                    <p className="text-3xl font-black text-center" style={{ color: currentPickingTeam === 'A' ? colors.teamAColor : colors.teamBColor }}>
+                                        {currentPickingTeam ? `Tim ${currentPickingTeam} - Slot ${currentPickSlot + 1}` : 'Draft Selesai!'}
+                                    </p>
+                                </div>
+
+                                {suggestedCounters.length > 0 && (
+                                    <div className="card p-4 w-full mb-6">
+                                        <h3 className="text-xl font-bold mb-2 text-center" style={{ color: colors.accent }}>Saran Counter:</h3>
+                                        <p className="text-sm text-gray-400 text-center mb-2">Melawan {currentPickingTeam === 'A' ? (teamB[currentPickSlot] ? teamB[currentPickSlot].name : 'Hero Musuh') : (teamA[currentPickSlot] ? teamA[currentPickSlot].name : 'Hero Musuh')}</p>
+                                        <div className="flex flex-wrap justify-center gap-2">
+                                            {suggestedCounters.map(hero => (
+                                                <div key={hero.name} className="flex flex-col items-center text-sm">
+                                                    <img src={hero.photoUrl} alt={hero.name} className="w-12 h-12 rounded-full object-cover border-2" style={{ borderColor: colors.accent }} />
+                                                    <span className="text-xs mt-1">{hero.name}</span>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
                                 )}
+                                
+                                <button onClick={resetSimulation} className="reset-button">Reset Simulasi</button>
+                            </div>
+
+                            {/* Team B */}
+                            <div className="lg:col-span-1 card p-6">
+                                <h2 className="text-2xl font-bold mb-4 text-center" style={{ color: colors.teamBColor }}>Tim Musuh (Merah)</h2>
+                                <div className="grid grid-cols-3 gap-4">
+                                    {teamB.map((hero, index) => (
+                                        <div 
+                                            key={index} 
+                                            className={`team-slot ${hero ? 'picked' : ''}`} 
+                                            style={{ borderColor: hero ? colors.teamBColor : colors.border }}
+                                        >
+                                            {hero ? (
+                                                <>
+                                                    <img src={hero.photoUrl} alt={hero.name} style={{ borderColor: colors.teamBColor }} />
+                                                    <span className="text-sm font-semibold mt-1">{hero.name}</span>
+                                                </>
+                                            ) : (
+                                                <span className="text-gray-500">Slot {index + 1}</span>
+                                            )}
+                                            {currentPickSlot === index && currentPickingTeam === 'B' && !hero && (
+                                                <button onClick={() => handlePickClick('B', index)} className="pick-button">Pilih</mbutton>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
-                    )}
+
+                        {showHeroPicker && (
+                            <div className="modal-overlay">
+                                <div className="modal-content">
+                                    <button onClick={() => setShowHeroPicker(false)} className="close-button">&times;</button>
+                                    <h3 className="text-2xl font-bold mb-4 text-center" style={{ color: colors.secondary }}>Pilih Hero</h3>
+                                    <input
+                                        type="text"
+                                        placeholder="Cari hero..."
+                                        className="w-full p-2 rounded-lg mb-4"
+                                        value={pickerSearchTerm}
+                                        onChange={(e) => setPickerSearchTerm(e.target.value)}
+                                    />
+                                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3 max-h-80 overflow-y-auto">
+                                        {filteredPickerHeroes.map(hero => (
+                                            <div 
+                                                key={hero.name} 
+                                                className="flex flex-col items-center p-2 card cursor-pointer hover:scale-105 transition-transform duration-200"
+                                                onClick={() => handleHeroSelect(hero)}
+                                            >
+                                                <img src={hero.photoUrl} alt={hero.name} className="w-16 h-16 rounded-full object-cover mb-1 border-2" style={{ borderColor: colors.accent }} />
+                                                <span className="text-xs font-semibold text-center">{hero.name}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {filteredPickerHeroes.length === 0 && pickerSearchTerm.length > 0 && (
+                                        <p className="text-center text-gray-400 mt-4">Hero "{pickerSearchTerm}" tidak ditemukan atau sudah dipilih.</p>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             );
         }
@@ -1980,20 +1986,22 @@
 
             return (
                 <div className="p-4 md:p-8">
-                    <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
-                        Gameplay Sesuai Patchnote Terbaru
-                    </h1>
-                    <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
-                        Rekomendasi strategis untuk beradaptasi dengan meta patch 1.9.91.
-                    </p>
+                    <div className="max-w-6xl mx-auto p-6 rounded-xl shadow-2xl card"> {/* Added card styling here */}
+                        <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
+                            Gameplay Sesuai Patchnote Terbaru
+                        </h1>
+                        <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
+                            Rekomendasi strategis untuk beradaptasi dengan meta patch 1.9.91.
+                        </p>
 
-                    <div className="max-w-4xl mx-auto space-y-6">
-                        {gameplayTips.map((tip, index) => (
-                            <div key={index} className="card p-6 text-left">
-                                <h3 className="text-2xl font-semibold mb-2" style={{ color: colors.secondary }}>{tip.title}</h3>
-                                <p className="text-gray-300">{tip.description}</p>
-                            </div>
-                        ))}
+                        <div className="max-w-4xl mx-auto space-y-6">
+                            {gameplayTips.map((tip, index) => (
+                                <div key={index} className="card p-6 text-left">
+                                    <h3 className="text-2xl font-semibold mb-2" style={{ color: colors.secondary }}>{tip.title}</h3>
+                                    <p className="text-gray-300">{tip.description}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             );
@@ -2012,22 +2020,24 @@
 
             return (
                 <div className="p-4 md:p-8">
-                    <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
-                        Combo-Combo Hero Efektif
-                    </h1>
-                    <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
-                        Sinergi hero yang kuat untuk mendominasi pertandingan.
-                    </p>
+                    <div className="max-w-6xl mx-auto p-6 rounded-xl shadow-2xl card"> {/* Added card styling here */}
+                        <h1 className="text-4xl md:text-5xl font-black mb-2 text-center" style={{ color: colors.primary }}>
+                            Combo-Combo Hero Efektif
+                        </h1>
+                        <p className="text-lg md:text-xl text-center mb-8" style={{ color: colors.subtext }}>
+                            Sinergi hero yang kuat untuk mendominasi pertandingan.
+                        </p>
 
-                    <div className="max-w-4xl mx-auto space-y-6">
-                        {comboTips.map((combo, index) => (
-                            <div key={index} className="card p-6 text-left">
-                                <h3 className="text-2xl font-semibold mb-2" style={{ color: colors.secondary }}>
-                                    {combo.heroes.join(' + ')}
-                                </h3>
-                                <p className="text-gray-300">{combo.description}</p>
-                            </div>
-                        ))}
+                        <div className="max-w-4xl mx-auto space-y-6">
+                            {comboTips.map((combo, index) => (
+                                <div key={index} className="card p-6 text-left">
+                                    <h3 className="text-2xl font-semibold mb-2" style={{ color: colors.secondary }}>
+                                        {combo.heroes.join(' + ')}
+                                    </h3>
+                                    <p className="text-gray-300">{combo.description}</p>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             );
@@ -2140,8 +2150,12 @@
                     {currentPage === 'tips' && <TipsPage gameplayTips={gameplayTips} comboTips={comboTips} />}
 
                     {selectedHero && <HeroDetailModal hero={selectedHero} onClose={handleCloseModal} />}
+
+                    {/* Logo Section */}
+                    <footer className="w-full text-center py-8 mt-12" style={{ borderTop: `1px solid ${colors.border}` }}>
+                        />
                         <p className="text-sm mt-4" style={{ color: colors.subtext }}>
-                            by KnolDua Divisi Mobile Legends.
+                            Dibuat dengan ❤️ untuk komunitas Mobile Legends.
                         </p>
                     </footer>
                 </div>
