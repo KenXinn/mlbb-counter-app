@@ -502,7 +502,7 @@
                 counterSpells: ['Purify', 'Flicker (untuk melarikan diri)'],
                 tactics: 'Gunakan CC keras saat dia mendekat, burst dia sebelum dia bisa mengeluarkan kombo penuh.',
                 skills: [
-                    { name: 'Pasif: Dagger Specialist', description: 'Memulihkan HP dan memberikan damage tambahan setelah menggunakan skill.' },
+                    { name: 'Pasif: Dagger Specialist', description: 'Memulihkan HP dan memberikan damage tambahan setelah using skill.' },
                     { name: 'Skill 1: Sword Spike', description: 'Melemparkan dagger ke target.' },
                     { name: 'Skill 2: Shadowblade Slaughter', description: 'Melemparkan banyak dagger ke area.' },
                     { name: 'Ultimate: Incandescence', description: 'Reset cooldown skill dan dash.' }
@@ -544,7 +544,7 @@
                 weaknesses: 'Bisa di-kiting, rentan burst',
                 counterHeroes: ['Hero dengan mobilitas tinggi (Ling, Lancelot)', 'Hero dengan burst damage'],
                 counterItems: ['Physical Defense Items', 'Anti-Burst Items'],
-                counterSpells: ['Purify', 'Flicker (untuk melarikan diri dari Ult)'],
+                counterSpells: ['Purify', 'Flicker (untuk melarikan diri from Ult)'],
                 tactics: 'Kiting dia, burst dia sebelum dia bisa mengunci tim.',
                 skills: [
                     { name: 'Pasif: All United', description: 'Mendapatkan gold tambahan dari kill dan assist.' },
@@ -2150,14 +2150,6 @@
                     {currentPage === 'tips' && <TipsPage gameplayTips={gameplayTips} comboTips={comboTips} />}
 
                     {selectedHero && <HeroDetailModal hero={selectedHero} onClose={handleCloseModal} />}
-
-                    {/* Logo Section */}
-                    <footer className="w-full text-center py-8 mt-12" style={{ borderTop: `1px solid ${colors.border}` }}>
-                        />
-                        <p className="text-sm mt-4" style={{ color: colors.subtext }}>
-                            Dibuat dengan ❤️ untuk komunitas Mobile Legends.
-                        </p>
-                    </footer>
                 </div>
             );
         }
